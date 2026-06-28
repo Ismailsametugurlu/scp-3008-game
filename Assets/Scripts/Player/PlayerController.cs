@@ -1,18 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Oyuncunun FPS hareketini, kamera bakışını, çömelme ve ıslık mekaniklerini yönetir.
-// CharacterController kullanır — Rigidbody değil (daha öngörülebilir FPS hareketi için).
+// FPS hareket, kamera, çömelme, ıslık — direkt Input API kullanır (generated class gerektirmez)
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Hareket Hızları")]
+    [Header("Hareket")]
     [SerializeField] private float walkSpeed = 4f;
     [SerializeField] private float runSpeed = 7f;
     [SerializeField] private float crouchSpeed = 2f;
-
-    [Header("Yerçekimi")]
     [SerializeField] private float gravity = -20f;
 
     [Header("Çömelme")]
@@ -20,10 +17,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float crouchHeight = 0.9f;
     [SerializeField] private float crouchTransitionSpeed = 10f;
 
-    [Header("Kamera Bakışı")]
+    [Header("Kamera")]
     [SerializeField] private float mouseSensitivity = 0.15f;
     [SerializeField] private float maxVerticalAngle = 85f;
-    // Kameranın parent transform'u (göz hizasında boş bir GameObject)
     [SerializeField] private Transform cameraHolder;
 
     [Header("Islık")]
@@ -31,12 +27,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float whistleCooldown = 3f;
 
     private CharacterController cc;
-    private InputSystem_Actions inputActions;
     private AudioSource audioSource;
-
-    // Lambda event'leri doğru şekilde unsubscribe edebilmek için referans tutulur
-    private System.Action<InputAction.CallbackContext> onCrouch;
-    private System.Action<InputAction.CallbackContext> onWhistle;
 
     private Vector3 verticalVelocity;
     private float verticalRotation;
@@ -46,115 +37,94 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        cc          = GetComponent<CharacterController>();
+        cc = GetComponent<CharacterController>();
         audioSource = GetComponent<AudioSource>();
-        inputActions = new InputSystem_Actions();
 
-        // CharacterController başlangıç boyutunu ayakta yüksekliğe eşitle
         targetHeight = standHeight;
-        cc.height    = standHeight;
-        cc.center    = new Vector3(0f, standHeight * 0.5f, 0f);
-    }
-
-    private void OnEnable()
-    {
-        inputActions.Player.Enable();
-
-        onCrouch  = _ => ToggleCrouch();
-        onWhistle = _ => TryWhistle();
-
-        inputActions.Player.Crouch.performed  += onCrouch;
-        inputActions.Player.Whistle.performed += onWhistle;
-    }
-
-    private void OnDisable()
-    {
-        inputActions.Player.Crouch.performed  -= onCrouch;
-        inputActions.Player.Whistle.performed -= onWhistle;
-        inputActions.Player.Disable();
+        cc.height = standHeight;
+        cc.center = new Vector3(0f, standHeight * 0.5f, 0f);
     }
 
     private void Start()
     {
-        // FPS için mouse'u ekrana kilitle ve gizle
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible   = false;
+        Cursor.visible = false;
     }
 
     private void Update()
     {
         HandleLook();
         HandleMovement();
+        HandleCrouch();
         HandleCrouchTransition();
         ApplyGravity();
+        HandleWhistle();
     }
 
-    // Mouse X → oyuncuyu yatayda döndür | Mouse Y → kamerayı dikeyeye döndür
+    // Mouse hareketi: X → oyuncu yatay dönüşü, Y → kamera dikey dönüşü
     private void HandleLook()
     {
-        Vector2 look = inputActions.Player.Look.ReadValue<Vector2>();
+        Vector2 delta = Mouse.current.delta.ReadValue();
 
-        // Oyuncu Y ekseninde döner (yatay bakış)
-        transform.Rotate(Vector3.up, look.x * mouseSensitivity);
+        transform.Rotate(Vector3.up, delta.x * mouseSensitivity);
 
-        // Kamera X ekseninde döner (dikey bakış), aşırı açı engellenir
-        verticalRotation -= look.y * mouseSensitivity;
-        verticalRotation  = Mathf.Clamp(verticalRotation, -maxVerticalAngle, maxVerticalAngle);
+        verticalRotation -= delta.y * mouseSensitivity;
+        verticalRotation = Mathf.Clamp(verticalRotation, -maxVerticalAngle, maxVerticalAngle);
 
         if (cameraHolder != null)
             cameraHolder.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
     }
 
-    // WASD hareketi; çökelme/koşma durumuna göre hız seçilir
+    // WASD + Shift ile hareket
     private void HandleMovement()
     {
-        Vector2 input     = inputActions.Player.Move.ReadValue<Vector2>();
-        bool    sprinting = inputActions.Player.Sprint.IsPressed();
+        var kb = Keyboard.current;
+        float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
+        float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
 
-        float   speed = isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed);
-        Vector3 move  = transform.right * input.x + transform.forward * input.y;
+        bool sprinting = kb.leftShiftKey.isPressed;
+        float speed = isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed);
 
+        Vector3 move = transform.right * x + transform.forward * z;
         cc.Move(move * speed * Time.deltaTime);
     }
 
-    // C tuşu: çökelme toggle. Ayağa kalkarken baş üstü engel kontrolü yapılır
-    private void ToggleCrouch()
+    // C ile çökelme toggle; ayağa kalkarken baş üstü engel kontrolü
+    private void HandleCrouch()
     {
+        if (!Keyboard.current.cKey.wasPressedThisFrame) return;
+
         if (isCrouching)
         {
-            // Üstte nesne varsa ayağa kalkma
             bool blocked = Physics.SphereCast(
                 transform.position + Vector3.up * crouchHeight,
-                cc.radius * 0.9f,
-                Vector3.up,
-                out _,
+                cc.radius * 0.9f, Vector3.up, out _,
                 standHeight - crouchHeight + 0.1f
             );
             if (blocked) return;
         }
 
-        isCrouching  = !isCrouching;
+        isCrouching = !isCrouching;
         targetHeight = isCrouching ? crouchHeight : standHeight;
     }
 
-    // CharacterController yüksekliğini hedef değere doğru yumuşakça geçirir
+    // CharacterController yüksekliğini yumuşakça değiştirir
     private void HandleCrouchTransition()
     {
         if (Mathf.Abs(cc.height - targetHeight) < 0.01f) return;
 
-        float newHeight = Mathf.Lerp(cc.height, targetHeight, crouchTransitionSpeed * Time.deltaTime);
-        cc.height = newHeight;
-        cc.center = new Vector3(0f, newHeight * 0.5f, 0f);
+        float h = Mathf.Lerp(cc.height, targetHeight, crouchTransitionSpeed * Time.deltaTime);
+        cc.height = h;
+        cc.center = new Vector3(0f, h * 0.5f, 0f);
 
-        // Kamera holder'ı yüksekliğe göre kaydır (göz hizasını koru)
         if (cameraHolder != null)
         {
             Vector3 p = cameraHolder.localPosition;
-            cameraHolder.localPosition = new Vector3(p.x, newHeight * 0.85f, p.z);
+            cameraHolder.localPosition = new Vector3(p.x, h * 0.85f, p.z);
         }
     }
 
-    // Yerçekimi: yerde küçük negatif değer (zemine tutunma), havada artan düşüş hızı
+    // Yerçekimi uygula
     private void ApplyGravity()
     {
         if (cc.isGrounded && verticalVelocity.y < 0f)
@@ -165,17 +135,14 @@ public class PlayerController : MonoBehaviour
         cc.Move(verticalVelocity * Time.deltaTime);
     }
 
-    // T tuşu: cooldown süresi dolmadıysa ıslık çalmaz; dolduysa ses oynatır ve log basar
-    private void TryWhistle()
+    // T tuşu ıslık; cooldown dolmadan çalmaz
+    private void HandleWhistle()
     {
+        if (!Keyboard.current.tKey.wasPressedThisFrame) return;
         if (Time.time - lastWhistleTime < whistleCooldown) return;
 
         lastWhistleTime = Time.time;
-
-        if (whistleClip != null)
-            audioSource.PlayOneShot(whistleClip);
-
-        // TODO (Oturum 10): Network üzerinden diğer oyunculara ıslık sinyali gönder
-        Debug.Log($"[PlayerController] Islık! Cooldown: {whistleCooldown}s");
+        if (whistleClip != null) audioSource.PlayOneShot(whistleClip);
+        Debug.Log("[Player] Islık!");
     }
 }
