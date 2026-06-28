@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController cc;
     private AudioSource audioSource;
+    private PlayerStatsController statsController;
 
     private Vector3 verticalVelocity;
     private float verticalRotation;
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviour
     {
         cc = GetComponent<CharacterController>();
         audioSource = GetComponent<AudioSource>();
+        statsController = GetComponent<PlayerStatsController>();
 
         targetHeight = standHeight;
         cc.height = standHeight;
@@ -83,7 +85,8 @@ public class PlayerController : MonoBehaviour
         float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
 
         bool sprinting = kb.leftShiftKey.isPressed;
-        float speed = isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed);
+        float statMult = statsController != null ? statsController.SpeedMultiplier : 1f;
+        float speed = (isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed)) * statMult;
 
         Vector3 move = transform.right * x + transform.forward * z;
         cc.Move(move * speed * Time.deltaTime);
