@@ -18,144 +18,214 @@
       --muted: #6b6a64;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; padding: 2rem; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
     h1 { font-size: 1.8rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
-    .last-updated { color: var(--muted); font-size: 0.78rem; float: right; margin-top: -2.5rem; }
+    .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .tagline { color: var(--text); font-style: italic; font-size: 0.9rem; margin-bottom: 2rem; border-left: 3px solid var(--accent); padding-left: 0.75rem; }
     section { margin-bottom: 2.5rem; }
-    section h2 { font-size: 1rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 1rem; }
-    .milestone { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 0.75rem; display: flex; align-items: flex-start; gap: 1rem; }
+    section h2 { font-size: 0.95rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 1rem; }
+    .milestone { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 0.6rem; display: flex; align-items: flex-start; gap: 1rem; }
     .milestone:hover { border-color: var(--accent); transition: border-color 0.2s; }
-    .badge { min-width: 90px; text-align: center; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge { min-width: 80px; text-align: center; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
     .badge.done    { background: #1a3d2b; color: var(--success); border: 1px solid var(--success); }
     .badge.wip     { background: #3d2d0d; color: var(--warn);    border: 1px solid var(--warn); }
     .badge.todo    { background: #1e1e26; color: var(--muted);   border: 1px solid var(--border); }
-    .badge.blocked { background: #3d0d0d; color: var(--danger);  border: 1px solid var(--danger); }
     .ms-body { flex: 1; }
-    .ms-title { font-weight: 600; font-size: 0.95rem; color: #f0ede4; margin-bottom: 0.2rem; }
-    .ms-desc  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
-    .ms-notes { margin-top: 0.4rem; font-size: 0.8rem; color: var(--text); background: #0d0d0f; border-left: 3px solid var(--accent2); padding: 0.3rem 0.6rem; border-radius: 0 4px 4px 0; }
+    .ms-title { font-weight: 600; font-size: 0.92rem; color: #f0ede4; margin-bottom: 0.2rem; }
+    .ms-desc  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+    .ms-note  { margin-top: 0.35rem; font-size: 0.78rem; color: var(--text); background: #0d0d0f; border-left: 3px solid var(--accent2); padding: 0.25rem 0.5rem; border-radius: 0 4px 4px 0; }
+    .num { color: var(--muted); font-size: 0.75rem; min-width: 24px; padding-top: 0.15rem; }
     .bug-list { list-style: none; }
-    .bug-list li { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--danger); border-radius: 6px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
-    .bug-list li span { color: var(--muted); font-size: 0.75rem; margin-left: 0.5rem; }
-    .decision-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 0.8rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
+    .bug-list li { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--danger); border-radius: 6px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; font-size: 0.83rem; }
+    .decision-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 0.7rem 0.9rem; margin-bottom: 0.5rem; font-size: 0.83rem; }
     .decision-box strong { color: var(--accent); }
-    .tag { display: inline-block; background: #23232d; color: var(--accent2); font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; margin-right: 0.3rem; }
-    footer { color: var(--muted); font-size: 0.78rem; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    footer { color: var(--muted); font-size: 0.76rem; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .phase-label { font-size: 0.72rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 1.2rem 0 0.5rem; font-weight: 700; }
   </style>
 </head>
 <body>
 
 <h1>⚠ SCP-3008</h1>
-<p class="subtitle">Co-op Hayatta Kalma / Korku — Unity 6 URP — Sonsuz IKEA</p>
-<p class="last-updated">Güncellendi: 28 Haziran 2026</p>
+<p class="subtitle">Co-op Hayatta Kalma · Crafting · Keşif · Unity 6 URP</p>
+<p class="tagline">Sonsuz bir IKEA'da gözlerini açıyorsun. Hiçbir şeyin yok. Hayatta kal, keşfet, güçlen.</p>
 
-<!-- MVP MİLESTONES -->
+<!-- MVP -->
 <section>
   <h2>MVP Yol Haritası</h2>
 
+  <p class="phase-label">⬛ Faz 1 — Temel Hayatta Kalma</p>
+
   <div class="milestone">
-    <span class="badge wip">WIP</span>
+    <span class="num">01</span>
+    <span class="badge done">Bitti</span>
     <div class="ms-body">
-      <div class="ms-title">1. FPS Oyuncu Kontrolü</div>
-      <div class="ms-desc">Yürüme, koşma, çömelme, bakma (mouse look), ıslık çalma. CharacterController tabanlı.</div>
-      <div class="ms-notes">✅ Oturum 1 — PlayerController.cs yazıldı. Whistle aksiyonu InputSystem'e eklendi (T tuşu). Klasör yapısı kuruldu.</div>
+      <div class="ms-title">FPS Oyuncu Kontrolü</div>
+      <div class="ms-desc">WASD yürüme, Shift koşma, C çömelme, mouse look, T ıslık.</div>
+      <div class="ms-note">PlayerController.cs — direkt Keyboard/Mouse API, CharacterController tabanlı.</div>
     </div>
   </div>
 
   <div class="milestone">
-    <span class="badge todo">TODO</span>
+    <span class="num">02</span>
+    <span class="badge done">Bitti</span>
     <div class="ms-body">
-      <div class="ms-title">2. Sağlık / Açlık / Enerji Sistemi</div>
-      <div class="ms-desc">3 ayrı bar, zaman geçtikçe azalma, düşük açlıkta can kaybı. PlayerStats ScriptableObject.</div>
+      <div class="ms-title">Sağlık / Açlık / Enerji Sistemi</div>
+      <div class="ms-desc">3 bar, zamanla azalma, açlıktan can kaybı, enerji bitince yavaşlama. Event-tabanlı UI.</div>
+      <div class="ms-note">PlayerStatsSO + PlayerStatsController + StatsHUD.</div>
     </div>
   </div>
 
   <div class="milestone">
-    <span class="badge todo">TODO</span>
+    <span class="num">03</span>
+    <span class="badge wip">Sırada</span>
     <div class="ms-body">
-      <div class="ms-title">3. Test Odası (Mekanik Sandbox)</div>
-      <div class="ms-desc">Basit bir oda sahnesi — sonsuzluk yok, sadece mekanik testi için. BoxCollider duvarlar.</div>
+      <div class="ms-title">Basit Test Odası</div>
+      <div class="ms-desc">Duvarlar, zemin, tavan, ışık — mekanik testi için kapalı alan. Sonsuzluk yok.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">04</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">4. Yemek Toplama ve Yeme</div>
-      <div class="ms-desc">Mağazada yiyecek spawn, E tuşuyla alma, envanter, yeme animasyonu/efekti.</div>
+      <div class="ms-title">Yemek Toplama + Yeme</div>
+      <div class="ms-desc">E tuşuyla al, envanter temeli, yenince Hunger bar dolsun. Yemek keşifle bulunur.</div>
+    </div>
+  </div>
+
+  <p class="phase-label">🟫 Faz 2 — Dünya ve Keşif</p>
+
+  <div class="milestone">
+    <span class="num">05</span>
+    <span class="badge todo">TODO</span>
+    <div class="ms-body">
+      <div class="ms-title">Chunk Sistemi + Prosedürel Oda Üretimi</div>
+      <div class="ms-desc">Dünya chunk'lara bölünür. Her chunk'ta loot bir kez çıkar; oyuncu uzaklaşırsa chunk resetlenir, farklı layout ve loot üretilir. Farming yok — sürekli ilerleme zorunlu.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">06</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">5. Modüler Oda Sistemi → Sonsuz Mağaza</div>
-      <div class="ms-desc">Oda prefabları, prosedürel yerleştirme, şerit sistemi, object pooling ile sonsuz alan.</div>
+      <div class="ms-title">Gizli Oda Sistemi</div>
+      <div class="ms-desc">Bazı chunk'larda duvar arkası geçit, kilitli kapı veya gizli raf. Keşfetmeye değer nadir loot içerir.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">07</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">6. Gece/Gündüz Döngüsü</div>
-      <div class="ms-desc">Zaman sistemi, ambians değişimi, gece bildirimi, gündüz/gece geçişi efekti.</div>
+      <div class="ms-title">Gece / Gündüz Döngüsü</div>
+      <div class="ms-desc">Zaman sistemi, gündüz/gece geçiş efekti, ambiyans değişimi, gece bildirimi.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">08</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">7. El Feneri + Işık Mekaniği</div>
-      <div class="ms-desc">El feneri toggle, ışık yoğunluğu = canavar çekim riski artar. Çalışanlar ışığı görür.</div>
+      <div class="ms-title">El Feneri + Işık Mekaniği</div>
+      <div class="ms-desc">El feneri toggle. Işık = yaratık çekim riski artar. Karanlık = daha güvenli ama tehlikeli.</div>
+    </div>
+  </div>
+
+  <p class="phase-label">🟥 Faz 3 — Tehdit ve Gizlilik</p>
+
+  <div class="milestone">
+    <span class="num">09</span>
+    <span class="badge todo">TODO</span>
+    <div class="ms-body">
+      <div class="ms-title">İlk Yaratık: Yüzsüz Çalışan</div>
+      <div class="ms-desc">NavMesh AI. Gündüz pasif wander, gece saldırgan. Sese tepki verir. Vurunca 3 sn donar.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">10</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">8. Çalışan (Canavar) AI</div>
-      <div class="ms-desc">NavMesh, gündüz pasif wander, gece saldırgan chase/attack. Vurunca birkaç saniye donma.</div>
+      <div class="ms-title">Gizlilik Sistemi</div>
+      <div class="ms-desc">Yaratıkların algı sistemi: ses, ışık, hareket. Çömelme + yavaş yürüyüş = düşük algı. UI'da tehlike göstergesi.</div>
+    </div>
+  </div>
+
+  <p class="phase-label">🟨 Faz 4 — Güçlenme</p>
+
+  <div class="milestone">
+    <span class="num">11</span>
+    <span class="badge todo">TODO</span>
+    <div class="ms-body">
+      <div class="ms-title">Crafting Sistemi</div>
+      <div class="ms-desc">Malzeme toplama, kombinasyon tarifleri, envanter UI. Tezgah gerektirmez. Erken: sopa/meşale. Geç: metal balta, molotof.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">12</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">9. Üs İnşa Sistemi</div>
-      <div class="ms-desc">Mobilya taşıma/yerleştirme, "güvenli alan" oluşturma. Grid tabanlı veya serbest.</div>
+      <div class="ms-title">İkinci Yaratık: Gözlemci</div>
+      <div class="ms-desc">Işığa tepki verir. El feneri veya ışıklı ortamda yaklaşır.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">13</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">10. Co-op Çok Oyunculu (Ağ Katmanı)</div>
-      <div class="ms-desc">Seçilen ağ kütüphanesi entegrasyonu. Farklı yerlerde spawn. Host/Client akışı.</div>
+      <div class="ms-title">Üs / Sığınak Kurma</div>
+      <div class="ms-desc">Mobilya taşıyıp yerleştirerek güvenli alan oluşturma. Gece için kritik.</div>
+    </div>
+  </div>
+
+  <p class="phase-label">🟦 Faz 5 — Co-op</p>
+
+  <div class="milestone">
+    <span class="num">14</span>
+    <span class="badge todo">TODO</span>
+    <div class="ms-body">
+      <div class="ms-title">Co-op Ağ Katmanı (NGO)</div>
+      <div class="ms-desc">Netcode for GameObjects entegrasyonu. Host/Client. Farklı noktada spawn. 1–6 kişi.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">15</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">11. Sütun Bilgisayar Görev Sistemi</div>
-      <div class="ms-desc">Mağaza sütunlarındaki bilgisayarlar, gece aktif, koordinat sistemi (A1/B3/G7), görev UI.</div>
+      <div class="ms-title">Proximity Voice Chat</div>
+      <div class="ms-desc">Yakındaki net, uzaktaki zayıf duyulur. Paket oturumda seçilecek.</div>
+    </div>
+  </div>
+
+  <p class="phase-label">⬜ Faz 6 — Derinlik ve Cila</p>
+
+  <div class="milestone">
+    <span class="num">16</span>
+    <span class="badge todo">TODO</span>
+    <div class="ms-body">
+      <div class="ms-title">Üçüncü Yaratık: Avcı</div>
+      <div class="ms-desc">Harekete tepki verir. Koşarsan kovalar, yavaş yürürsen görmez.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">17</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">12. Açılabilir Odalar (İlerleme Sistemi)</div>
-      <div class="ms-desc">Görev tamamlandıkça yeni alan açılır. Gerçek çıkış YOK — bu oyunun ruhu.</div>
+      <div class="ms-title">Sütun Bilgisayarı + Koordinat Sistemi</div>
+      <div class="ms-desc">Gece aktif. A1/B3/G7 koordinatı, ipucu verir. Oyuncuların buluşmasını kolaylaştırır.</div>
     </div>
   </div>
 
   <div class="milestone">
+    <span class="num">18</span>
     <span class="badge todo">TODO</span>
     <div class="ms-body">
-      <div class="ms-title">13. Giriş Hikayesi + Ölüm/Respawn + Platform Göstergesi</div>
-      <div class="ms-desc">İlk girişte SCP hikaye ekranı. Ölünce farklı yerde spawn. İsmin üstünde PC/mobil/tablet tag.</div>
+      <div class="ms-title">Giriş Hikayesi + Ölüm/Respawn + Platform Göstergesi</div>
+      <div class="ms-desc">İlk girişte SCP hikaye ekranı. Ölünce farklı noktada spawn. İsim üstünde PC/mobil/tablet tag.</div>
     </div>
   </div>
 </section>
@@ -163,29 +233,21 @@
 <!-- MİMARİ KARARLAR -->
 <section>
   <h2>Mimari Kararlar</h2>
-  <div class="decision-box">
-    <strong>Ağ Kütüphanesi:</strong> Seçilecek — Netcode for GameObjects vs Fishnet Pro<br/>
-    <span style="color:var(--muted); font-size:0.8rem;">İlk oturumda artı/eksiler anlatıldı, karar verildi.</span>
-  </div>
-  <div class="decision-box">
-    <strong>Karakter Fizik:</strong> <code>CharacterController</code> — Rigidbody değil. Daha öngörülebilir FPS hareketi için.
-  </div>
-  <div class="decision-box">
-    <strong>Input:</strong> Unity New Input System (<code>InputSystem_Actions.inputactions</code> mevcut).
-  </div>
-  <div class="decision-box">
-    <strong>Sonsuz Dünya:</strong> Object Pooling + Chunk tabanlı üretim. Instantiate/Destroy kullanılmaz.
-  </div>
+  <div class="decision-box"><strong>Ağ:</strong> Netcode for GameObjects — 5–6 kişi max, Unity Relay entegrasyonu kolay.</div>
+  <div class="decision-box"><strong>Karakter Fizik:</strong> CharacterController — Rigidbody değil. Öngörülebilir FPS hareketi.</div>
+  <div class="decision-box"><strong>Input:</strong> Direkt Keyboard.current / Mouse.current API (generated class gerektirmez).</div>
+  <div class="decision-box"><strong>Chunk Sistemi:</strong> Object Pooling — Instantiate/Destroy yok. Chunk reset = loot ve layout yeniden üretimi.</div>
+  <div class="decision-box"><strong>Proximity VC:</strong> Paket seçimi faz 5'te yapılacak (Vivox vs Dissonance vs Photon Voice).</div>
 </section>
 
-<!-- BİLİNEN BUGLAR -->
+<!-- BUGLAR -->
 <section>
   <h2>Bilinen Buglar</h2>
   <ul class="bug-list">
-    <li>Henüz bug yok — proje başlangıcı. <span>28 Haziran 2026</span></li>
+    <li>Slider handle'ları ekranda görünüyor — kozmetik, sonra düzeltilecek. <span style="color:var(--muted);font-size:0.75rem;">28 Haz 2026</span></li>
   </ul>
 </section>
 
-<footer>SCP-3008 Game Dev · 2026</footer>
+<footer>SCP-3008 · 2026</footer>
 </body>
 </html>
