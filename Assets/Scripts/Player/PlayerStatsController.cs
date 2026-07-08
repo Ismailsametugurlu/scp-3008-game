@@ -11,27 +11,34 @@ public class PlayerStatsController : MonoBehaviour
     public event Action<float> OnHealthChanged;
     public event Action<float> OnHungerChanged;
     public event Action<float> OnWaterChanged;
+    public event Action<float> OnStaminaChanged;
     public event Action OnPlayerDied;
 
-    public float CurrentHealth { get; private set; }
-    public float CurrentHunger { get; private set; }
-    public float CurrentWater  { get; private set; }
+    public float CurrentHealth  { get; private set; }
+    public float CurrentHunger  { get; private set; }
+    public float CurrentWater   { get; private set; }
+    public float CurrentStamina { get; private set; }
 
     // Su durumuna göre PlayerController hız çarpanı alır
     public float SpeedMultiplier => CurrentWater > 0f ? 1f : stats.lowWaterSpeedMultiplier;
+
+    // Stamina bittiyse PlayerController koşmayı kesmeli
+    public bool CanSprint => CurrentStamina > 0f;
 
     private bool isDead;
 
     private void Start()
     {
-        CurrentHealth = stats.maxHealth;
-        CurrentHunger = stats.maxHunger;
-        CurrentWater  = stats.maxWater;
+        CurrentHealth  = stats.maxHealth;
+        CurrentHunger  = stats.maxHunger;
+        CurrentWater   = stats.maxWater;
+        CurrentStamina = stats.maxStamina;
 
         // Başlangıç UI güncellemesi
         OnHealthChanged?.Invoke(CurrentHealth / stats.maxHealth);
         OnHungerChanged?.Invoke(CurrentHunger / stats.maxHunger);
         OnWaterChanged?.Invoke(CurrentWater / stats.maxWater);
+        OnStaminaChanged?.Invoke(CurrentStamina / stats.maxStamina);
     }
 
     private void Update()
@@ -40,12 +47,17 @@ public class PlayerStatsController : MonoBehaviour
         DecayStats();
     }
 
-    // Her frame'de açlık ve suyu düşür; koşarken su ekstra azalır; açlık sıfırsa can al
+    // Her frame'de açlık/su/stamina günceller; koşma stamina tarafından sınırlanır
     private void DecayStats()
     {
         ChangeHunger(-stats.hungerDecayRate * Time.deltaTime);
 
-        bool isSprinting = Keyboard.current.leftShiftKey.isPressed;
+        // Koşma isteği var ama stamina bittiyse artık koşamaz sayılır
+        bool isSprinting = Keyboard.current.leftShiftKey.isPressed && CurrentStamina > 0f;
+
+        ChangeStamina(isSprinting ? -stats.staminaDrainRate * Time.deltaTime
+                                   :  stats.staminaRegenRate * Time.deltaTime);
+
         float waterDrain = stats.waterDecayRate + (isSprinting ? stats.sprintWaterDrainRate : 0f);
         ChangeWater(-waterDrain * Time.deltaTime);
 
@@ -76,6 +88,12 @@ public class PlayerStatsController : MonoBehaviour
     {
         CurrentWater = Mathf.Clamp(CurrentWater + amount, 0f, stats.maxWater);
         OnWaterChanged?.Invoke(CurrentWater / stats.maxWater);
+    }
+
+    public void ChangeStamina(float amount)
+    {
+        CurrentStamina = Mathf.Clamp(CurrentStamina + amount, 0f, stats.maxStamina);
+        OnStaminaChanged?.Invoke(CurrentStamina / stats.maxStamina);
     }
 
     // Yemek yenince çağrılır (ilerleyen oturumda yemek sistemi bağlar)

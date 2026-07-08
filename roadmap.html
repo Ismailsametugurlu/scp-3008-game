@@ -1,253 +1,513 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCP-3008 — Yol Haritası</title>
-  <style>
-    :root {
-      --bg: #0d0d0f;
-      --surface: #16161a;
-      --border: #2a2a35;
-      --accent: #e8b84b;
-      --accent2: #5c8aff;
-      --danger: #ff4d4d;
-      --success: #4dff91;
-      --warn: #ffaa33;
-      --text: #d0cfc8;
-      --muted: #6b6a64;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; }
-    h1 { font-size: 1.8rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
-    .tagline { color: var(--text); font-style: italic; font-size: 0.9rem; margin-bottom: 2rem; border-left: 3px solid var(--accent); padding-left: 0.75rem; }
-    section { margin-bottom: 2.5rem; }
-    section h2 { font-size: 0.95rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 1rem; }
-    .milestone { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 0.6rem; display: flex; align-items: flex-start; gap: 1rem; }
-    .milestone:hover { border-color: var(--accent); transition: border-color 0.2s; }
-    .badge { min-width: 80px; text-align: center; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
-    .badge.done    { background: #1a3d2b; color: var(--success); border: 1px solid var(--success); }
-    .badge.wip     { background: #3d2d0d; color: var(--warn);    border: 1px solid var(--warn); }
-    .badge.todo    { background: #1e1e26; color: var(--muted);   border: 1px solid var(--border); }
-    .ms-body { flex: 1; }
-    .ms-title { font-weight: 600; font-size: 0.92rem; color: #f0ede4; margin-bottom: 0.2rem; }
-    .ms-desc  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-    .ms-note  { margin-top: 0.35rem; font-size: 0.78rem; color: var(--text); background: #0d0d0f; border-left: 3px solid var(--accent2); padding: 0.25rem 0.5rem; border-radius: 0 4px 4px 0; }
-    .num { color: var(--muted); font-size: 0.75rem; min-width: 24px; padding-top: 0.15rem; }
-    .bug-list { list-style: none; }
-    .bug-list li { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--danger); border-radius: 6px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; font-size: 0.83rem; }
-    .decision-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 0.7rem 0.9rem; margin-bottom: 0.5rem; font-size: 0.83rem; }
-    .decision-box strong { color: var(--accent); }
-    footer { color: var(--muted); font-size: 0.76rem; text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-    .phase-label { font-size: 0.72rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 1.2rem 0 0.5rem; font-weight: 700; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCP-3008 — Geliştirme Yol Haritası</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0f1117;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 40px 32px 60px;
+    min-width: 900px;
+  }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: center; gap: 18px; margin-bottom: 36px; }
+  .logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 4px 20px rgba(234,179,8,.45);
+  }
+  .header-text h1 {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(90deg, #eab308, #f5f5dc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -.3px;
+  }
+  .header-text p { font-size: 13px; color: #64748b; margin-top: 3px; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 28px; padding: 14px 18px;
+    background: #1e2130; border-radius: 10px; border: 1px solid #2d3148;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #94a3b8; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 36px; }
+  .section-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; padding: 8px 14px;
+    border-radius: 7px 7px 0 0;
+    display: flex; align-items: center; gap: 10px;
+    border-left: 4px solid;
+  }
+  .s1 .section-title  { background: #1a2636; border-color: #38bdf8; color: #38bdf8; }
+  .s2 .section-title  { background: #1a2d1a; border-color: #4ade80; color: #4ade80; }
+  .s3 .section-title  { background: #2a1f2e; border-color: #c084fc; color: #c084fc; }
+  .s4 .section-title  { background: #2e1f1f; border-color: #f87171; color: #f87171; }
+  .s5 .section-title  { background: #2e2b1a; border-color: #fbbf24; color: #fbbf24; }
+  .s6 .section-title  { background: #1a2636; border-color: #60a5fa; color: #60a5fa; }
+  .s7 .section-title  { background: #1a2d1a; border-color: #34d399; color: #34d399; }
+  .s8 .section-title  { background: #2a1f2e; border-color: #a78bfa; color: #a78bfa; }
+  .s9 .section-title  { background: #1f2330; border-color: #94a3b8; color: #94a3b8; }
+  .s10 .section-title { background: #2e1f1f; border-color: #fb923c; color: #fb923c; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; background: #161922; border-radius: 0 0 10px 10px; overflow: hidden; }
+  thead th {
+    background: #1e2130; padding: 10px 14px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px;
+    color: #64748b; text-align: center; border-bottom: 1px solid #2d3148;
+  }
+  thead th:first-child { text-align: left; min-width: 180px; }
+  thead th:last-child  { min-width: 120px; }
+  tbody tr { border-bottom: 1px solid #1e2130; transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #1a1e2c; }
+  td { padding: 10px 14px; font-size: 13px; text-align: center; vertical-align: middle; }
+  td:first-child { text-align: left; color: #cbd5e1; font-weight: 500; }
+  .cell-icon { font-size: 16px; line-height: 1; }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: .3px; white-space: nowrap;
+  }
+  .badge-done    { background: rgba(74,222,128,.15); color: #4ade80; border: 1px solid rgba(74,222,128,.3); }
+  .badge-partial { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
+  .badge-todo    { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+  .badge-next    { background: rgba(56,189,248,.15); color: #38bdf8; border: 1px solid rgba(56,189,248,.3); }
+
+  .feat-name { font-weight: 600; color: #e2e8f0; }
+  .feat-sub  { font-size: 11px; color: #475569; margin-top: 2px; }
+
+  /* Chips */
+  .chip {
+    display:inline-block; padding:2px 9px; border-radius:12px; font-size:10.5px;
+    font-weight:700; background:rgba(234,179,8,.12); color:#eab308;
+    border:1px solid rgba(234,179,8,.25); white-space:nowrap;
+  }
+
+  /* Footer */
+  .footer { margin-top: 44px; text-align: center; font-size: 12px; color: #334155; }
+  .footer span { color: #475569; }
+
+  /* ── Core Loop ── */
+  .loop-wrap { background:#161922; border-radius:0 0 10px 10px; padding:24px 20px; }
+  .loop-node {
+    background:#1e2130; border:1px solid #2d3148; border-radius:10px;
+    padding:11px 18px; font-size:13px; color:#e2e8f0; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .loop-node.accent { border-color:#eab308; background:#241f14; color:#eab308; }
+  .loop-arrow { color:#475569; font-size:16px; margin:6px 0 6px 22px; }
+  .loop-note  { font-size:11.5px; color:#64748b; font-style:italic; font-weight:400; }
+  .loop-back {
+    margin-top:12px; padding:10px 16px; border-radius:8px;
+    background:rgba(234,179,8,.08); border:1px dashed rgba(234,179,8,.35);
+    font-size:12.5px; color:#eab308; font-weight:600;
+  }
+
+  /* ── İlerleme Paneli ── */
+  .ilerleme-wrap { background: #161922; border: 1px solid #2d3148; border-radius: 12px; padding: 24px 28px 20px; margin-bottom: 28px; }
+  .ilerleme-ust { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .ilerleme-baslik { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .ilerleme-genel-yuzde {
+    font-size: 32px; font-weight: 800;
+    background: linear-gradient(90deg, #eab308, #f5f5dc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .ilerleme-ana-bg { background: #1e2130; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 24px; }
+  .ilerleme-ana-dolu { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #eab308, #f5f5dc); transition: width .4s ease; }
+  .kategori-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .kategori-ust { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .kategori-ad { font-size: 12px; font-weight: 700; color: #cbd5e1; }
+  .kategori-puan { font-size: 14px; font-weight: 800; }
+  .kategori-bar-bg { background: #1e2130; border-radius: 6px; height: 8px; overflow: hidden; }
+  .kategori-bar-dolu { height: 100%; border-radius: 6px; transition: width .4s ease; }
+  .kategori-alt { font-size: 10px; color: #475569; margin-top: 4px; }
+</style>
 </head>
 <body>
 
-<h1>⚠ SCP-3008</h1>
-<p class="subtitle">Co-op Hayatta Kalma · Crafting · Keşif · Unity 6 URP</p>
-<p class="tagline">Sonsuz bir IKEA'da gözlerini açıyorsun. Hiçbir şeyin yok. Hayatta kal, keşfet, güçlen.</p>
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="logo">🪑</div>
+  <div class="header-text">
+    <h1>SCP-3008 — Geliştirme Yol Haritası</h1>
+    <p>Unity 6 · URP · New Input System &nbsp;|&nbsp; Co-op Hayatta Kalma · Crafting · Keşif &nbsp;|&nbsp; Güncel: 6 Temmuz 2026</p>
+  </div>
+</div>
 
-<!-- MVP -->
-<section>
-  <h2>MVP Yol Haritası</h2>
+<!-- ══ LEGEND ══ -->
+<div class="legend">
+  <div class="legend-item">🟢 <span>Tamamlandı</span></div>
+  <div class="legend-item">🟡 <span>Kısmen / Devam ediyor</span></div>
+  <div class="legend-item">🔵 <span>Sırada</span></div>
+  <div class="legend-item">🔴 <span>Gerekli / Yapılmadı</span></div>
+  <div class="legend-item">➖ <span>Bu özellik için gerekmez</span></div>
+  <div class="legend-item" style="margin-left:auto; color:#64748b;">
+    <strong>Sütunlar:</strong>&nbsp; Kod · Animasyon · Model · UI · Ses
+  </div>
+</div>
 
-  <p class="phase-label">⬛ Faz 1 — Temel Hayatta Kalma</p>
+<!-- ══ İLERLEME PANELİ ══ -->
+<div class="ilerleme-wrap">
+  <div class="ilerleme-ust">
+    <div>
+      <div class="ilerleme-baslik">Genel İlerleme</div>
+      <div style="font-size:11px; color:#475569; margin-top:3px;">Kod · UI · Ses · Model · Animasyon ortalaması</div>
+    </div>
+    <div class="ilerleme-genel-yuzde">%7</div>
+  </div>
+  <div class="ilerleme-ana-bg"><div class="ilerleme-ana-dolu" style="width:7%"></div></div>
 
-  <div class="milestone">
-    <span class="num">01</span>
-    <span class="badge done">Bitti</span>
-    <div class="ms-body">
-      <div class="ms-title">FPS Oyuncu Kontrolü</div>
-      <div class="ms-desc">WASD yürüme, Shift koşma, C çömelme, mouse look, T ıslık.</div>
-      <div class="ms-note">PlayerController.cs — direkt Keyboard/Mouse API, CharacterController tabanlı.</div>
+  <div class="kategori-grid">
+    <div class="kategori">
+      <div class="kategori-ust"><span class="kategori-ad">⌨️ Kod</span><span class="kategori-puan" style="color:#38bdf8">%15</span></div>
+      <div class="kategori-bar-bg"><div class="kategori-bar-dolu" style="width:15%; background:#38bdf8"></div></div>
+      <div class="kategori-alt">FPS kontrol · Stats sistemi</div>
+    </div>
+    <div class="kategori">
+      <div class="kategori-ust"><span class="kategori-ad">🖥️ UI</span><span class="kategori-puan" style="color:#4ade80">%10</span></div>
+      <div class="kategori-bar-bg"><div class="kategori-bar-dolu" style="width:10%; background:#4ade80"></div></div>
+      <div class="kategori-alt">Stats HUD (3 slider)</div>
+    </div>
+    <div class="kategori">
+      <div class="kategori-ust"><span class="kategori-ad">🎵 Ses</span><span class="kategori-puan" style="color:#fbbf24">%2</span></div>
+      <div class="kategori-bar-bg"><div class="kategori-bar-dolu" style="width:2%; background:#fbbf24"></div></div>
+      <div class="kategori-alt">Islık altyapısı (klip yok)</div>
+    </div>
+    <div class="kategori">
+      <div class="kategori-ust"><span class="kategori-ad">🧊 Model</span><span class="kategori-puan" style="color:#c084fc">%2</span></div>
+      <div class="kategori-bar-bg"><div class="kategori-bar-dolu" style="width:2%; background:#c084fc"></div></div>
+      <div class="kategori-alt">Placeholder capsule</div>
+    </div>
+    <div class="kategori">
+      <div class="kategori-ust"><span class="kategori-ad">🏃 Animasyon</span><span class="kategori-puan" style="color:#f87171">%0</span></div>
+      <div class="kategori-bar-bg"><div class="kategori-bar-dolu" style="width:0%; background:#f87171"></div></div>
+      <div class="kategori-alt">Başlanmadı</div>
     </div>
   </div>
+</div>
 
-  <div class="milestone">
-    <span class="num">02</span>
-    <span class="badge done">Bitti</span>
-    <div class="ms-body">
-      <div class="ms-title">Sağlık / Açlık / Enerji Sistemi</div>
-      <div class="ms-desc">3 bar, zamanla azalma, açlıktan can kaybı, enerji bitince yavaşlama. Event-tabanlı UI.</div>
-      <div class="ms-note">PlayerStatsSO + PlayerStatsController + StatsHUD.</div>
-    </div>
+<!-- ══ ÇEKİRDEK DÖNGÜ ══ -->
+<div class="section s5">
+  <div class="section-title">🔁 &nbsp;Çekirdek Döngü</div>
+  <div class="loop-wrap">
+    <div class="loop-node accent">😵 Uyan — savunmasız, aç, zayıf</div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node">🔦 Çevreyi keşfet <span class="loop-note">— gizli oda ara</span></div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node">📦 Loot &amp; malzeme topla <span class="loop-note">— loot bir kez çıkar</span></div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node">🍔 Yemek bul, ye <span class="loop-note">— açlık/enerji yönet</span></div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node">🔨 Crafting — alet/silah yap</div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node">👹 Yaratıklardan kaç / gizlen / savaş</div>
+    <div class="loop-arrow">↓</div>
+    <div class="loop-node accent">💪 Güçlen → yeni bölge keşfet</div>
+    <div class="loop-back">🔄 Uzaklaşınca chunk resetlenir → farklı oda + yeni loot. Farming yok, sürekli ilerleme zorunlu.</div>
   </div>
+</div>
 
-  <div class="milestone">
-    <span class="num">03</span>
-    <span class="badge wip">Sırada</span>
-    <div class="ms-body">
-      <div class="ms-title">Basit Test Odası</div>
-      <div class="ms-desc">Duvarlar, zemin, tavan, ışık — mekanik testi için kapalı alan. Sonsuzluk yok.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 1 ══ -->
+<div class="section s1">
+  <div class="section-title">🕹️ &nbsp;Bölüm 1 — Hareket &amp; Kontroller</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">FPS Oyuncu Kontrolü</div><div class="feat-sub">PlayerController · WASD · Shift koşma · C çömelme · mouse look · CharacterController tabanlı</div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">🔴</td><td class="cell-icon">🟡</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Kamera Sistemi</div><div class="feat-sub">CameraHolder · dikey bakış clamp · göz hizası çömelmede kayar</div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Islık</div><div class="feat-sub">T tuşu · cooldown · co-op arkadaş bulma &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-partial">🟡 Klip bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">04</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Yemek Toplama + Yeme</div>
-      <div class="ms-desc">E tuşuyla al, envanter temeli, yenince Hunger bar dolsun. Yemek keşifle bulunur.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 2 ══ -->
+<div class="section s2">
+  <div class="section-title">❤️ &nbsp;Bölüm 2 — Hayatta Kalma</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Sağlık / Açlık / Su</div><div class="feat-sub">PlayerStatsSO + Controller + StatsHUD · zamanla azalma · açlıktan can kaybı · su bitince yavaşlama · event-tabanlı UI · (eski "Enerji" → Su/susuzluk oldu)</div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Stamina Sistemi</div><div class="feat-sub">koşma süresini sınırlar · bitince koşamazsın · koşarken suyu da ekstra tüketir · UI: alt-orta merkezde ince beyaz çizgi, doluyken gizli, merkezden aynalı şekilde sağ/sol eşit hızda büyür-küçülür &nbsp;<span class="chip">özgün fikir</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟡</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-partial">🟡 Sayılar taslak</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Yemek Toplama + Yeme</div><div class="feat-sub">E tuşu · Hunger doldurma · yemek keşifle bulunur &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔵</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-next">🔵 Sırada</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Akıl Sağlığı (Sanity)</div><div class="feat-sub">karanlıkta / yalnızken düşer · düşük sanity = görsel/işitsel efekt &nbsp;<span class="chip">Backrooms</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <p class="phase-label">🟫 Faz 2 — Dünya ve Keşif</p>
+<!-- ══ BÖLÜM 3 ══ -->
+<div class="section s3">
+  <div class="section-title">🌍 &nbsp;Bölüm 3 — Dünya &amp; Keşif</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Test Odası</div><div class="feat-sub">duvar · zemin · tavan · ışık — mekanik sandbox, sonsuzluk yok</div></td>
+        <td class="cell-icon">🔵</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-next">🔵 Sırada</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Chunk Sistemi + Prosedürel Üretim</div><div class="feat-sub">10-20 reyon tipi (mutfak/elektronik/yatak odası...) rastgele dizilir · her reyonun kendine uygun loot'u · loot bir kez çıkar · uzaklaşınca reset → yeni layout + yeni loot · object pooling · sabit map YOK &nbsp;<span class="chip">Backrooms: Escape Together</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Loot / Malzeme Veri Yapısı</div><div class="feat-sub">ScriptableObject · alınabilir/taşınabilir objeler · reyon-loot eşleşmesi · chunk'tan ÖNCE kurulur</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Ev Konumu — GPS Chunk Sabitleme</div><div class="feat-sub">kablolardan craftlanır (GPS cihazı) · yerleştirince o chunk + 8 komşu (3×3 = 9 chunk) sabitlenir, resetlenmez · geri dönünce üs/eşya yerinde kalır · sonsuz kaosta "güvenli ada" &nbsp;<span class="chip">özgün fikir</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Gizli Oda Sistemi</div><div class="feat-sub">duvar arkası geçit · kilitli kapı · gizli raf · nadir loot içerir</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Gece / Gündüz Döngüsü</div><div class="feat-sub">zaman sistemi · geçiş efekti · ambiyans · gece bildirimi &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">El Feneri + Işık Mekaniği</div><div class="feat-sub">toggle · ışık = yaratık çekim riski · karanlık = güvenli ama tehlikeli &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Blackout / Karanlık Olayı</div><div class="feat-sub">ışıklar kesilir · yaratıklar azgınlaşır · rastgele tetiklenir &nbsp;<span class="chip">Backrooms</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">05</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Chunk Sistemi + Prosedürel Oda Üretimi</div>
-      <div class="ms-desc">Dünya chunk'lara bölünür. Her chunk'ta loot bir kez çıkar; oyuncu uzaklaşırsa chunk resetlenir, farklı layout ve loot üretilir. Farming yok — sürekli ilerleme zorunlu.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 4 ══ -->
+<div class="section s4">
+  <div class="section-title">👹 &nbsp;Bölüm 4 — Yaratıklar &amp; AI</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Yüzsüz Çalışan</div><div class="feat-sub">NavMesh · gündüz pasif wander · gece saldırgan · sese tepki · vurunca 3 sn donar &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Gözlemci</div><div class="feat-sub">ışığa tepki verir · el feneri açıksa yaklaşır &nbsp;<span class="chip">Backrooms</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Avcı</div><div class="feat-sub">harekete tepki · koşarsan kovalar · yavaş yürürsen görmez</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">AI Director (Dinamik Zorluk)</div><div class="feat-sub">spawn yoğunluğu oyuncu durumuna göre ayarlanır · her oyun farklı &nbsp;<span class="chip">Lethal Company</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Nadir Boss Yaratık</div><div class="feat-sub">derin keşif ödülü · yüksek risk / yüksek loot</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">06</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Gizli Oda Sistemi</div>
-      <div class="ms-desc">Bazı chunk'larda duvar arkası geçit, kilitli kapı veya gizli raf. Keşfetmeye değer nadir loot içerir.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 5 ══ -->
+<div class="section s5">
+  <div class="section-title">🤫 &nbsp;Bölüm 5 — Gizlilik &amp; Tehlike</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Gizlilik Sistemi</div><div class="feat-sub">yaratık algısı: ses / ışık / hareket · çömel + yavaş yürü = düşük algı</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Tehlike Göstergesi</div><div class="feat-sub">UI'da algılanma barı · yaratık ne kadar yakın / farkında</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">07</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Gece / Gündüz Döngüsü</div>
-      <div class="ms-desc">Zaman sistemi, gündüz/gece geçiş efekti, ambiyans değişimi, gece bildirimi.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 6 ══ -->
+<div class="section s6">
+  <div class="section-title">🔨 &nbsp;Bölüm 6 — Crafting &amp; Envanter</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Envanter / Hotbar</div><div class="feat-sub">slot sistemi · 1-5 tuş / tekerlek seçim · slot upgrade &nbsp;<span class="chip">The Forest</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Crafting Sistemi</div><div class="feat-sub">malzeme + tarif · tezgah gerekmez · sopa → balta → molotof → zırh &nbsp;<span class="chip">The Forest</span> <span class="chip">Sons of the Forest</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Ekipman Kademeleri</div><div class="feat-sub">güçlenme çağı · erken kaç → geç savaş · silah tier'ları</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">08</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">El Feneri + Işık Mekaniği</div>
-      <div class="ms-desc">El feneri toggle. Işık = yaratık çekim riski artar. Karanlık = daha güvenli ama tehlikeli.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 7 ══ -->
+<div class="section s7">
+  <div class="section-title">🏠 &nbsp;Bölüm 7 — Üs / Sığınak</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Mobilya Taşıma / Yerleştirme</div><div class="feat-sub">güvenli alan kur · gece için kritik &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Tuzak / Savunma Kurma</div><div class="feat-sub">co-op gece savunması · yaratığa karşı bariyer/tuzak &nbsp;<span class="chip">Sons of the Forest</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <p class="phase-label">🟥 Faz 3 — Tehdit ve Gizlilik</p>
+<!-- ══ BÖLÜM 8 ══ -->
+<div class="section s8">
+  <div class="section-title">🌐 &nbsp;Bölüm 8 — Co-op &amp; Ağ</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Co-op Ağ Katmanı</div><div class="feat-sub">Netcode for GameObjects · Host/Client · farklı noktada spawn · 1–6 kişi</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Proximity Voice Chat</div><div class="feat-sub">yakın net · uzak zayıf · fısıltı kurtarır, konuşma öldürür · paket seçilecek &nbsp;<span class="chip">Lethal Company</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">09</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">İlk Yaratık: Yüzsüz Çalışan</div>
-      <div class="ms-desc">NavMesh AI. Gündüz pasif wander, gece saldırgan. Sese tepki verir. Vurunca 3 sn donar.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 9 ══ -->
+<div class="section s9">
+  <div class="section-title">🖥️ &nbsp;Bölüm 9 — İçerik &amp; Cila</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Sütun Bilgisayarı + Koordinat</div><div class="feat-sub">gece aktif · A1/B3/G7 koordinat · ipucu · buluşma kolaylığı &nbsp;<span class="chip">SCP-3008</span></div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Giriş Hikaye Ekranı</div><div class="feat-sub">ilk girişte kısa SCP-3008 hikayesi</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Ölüm / Respawn</div><div class="feat-sub">ölünce chunk'ta farklı noktada spawn · ekran efekti</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">🔴</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Platform Göstergesi</div><div class="feat-sub">oyuncu isminin üstünde PC / mobil / tablet tag</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div class="milestone">
-    <span class="num">10</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Gizlilik Sistemi</div>
-      <div class="ms-desc">Yaratıkların algı sistemi: ses, ışık, hareket. Çömelme + yavaş yürüyüş = düşük algı. UI'da tehlike göstergesi.</div>
-    </div>
-  </div>
+<!-- ══ BÖLÜM 10 ══ -->
+<div class="section s10">
+  <div class="section-title">🔧 &nbsp;Bölüm 10 — Teknik &amp; Optimizasyon</div>
+  <table>
+    <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="feat-name">Object Pooling</div><div class="feat-sub">chunk / loot / yaratık için · Instantiate/Destroy yok</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Optimizasyon</div><div class="feat-sub">LOD · occlusion culling · GPU instancing · sonsuz dünya performansı</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Kayıt Sistemi</div><div class="feat-sub">ilerleme · envanter · üs kaydet/yükle</div></td>
+        <td class="cell-icon">🔴</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🔴</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-todo">⏳ Bekliyor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-  <p class="phase-label">🟨 Faz 4 — Güçlenme</p>
+<div class="footer">
+  SCP-3008 · Temmuz 2026 &nbsp;|&nbsp;
+  <span>İlham: SCP-3008 · The Forest · Backrooms: Escape Together · Lethal Company · Sons of the Forest</span>
+</div>
 
-  <div class="milestone">
-    <span class="num">11</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Crafting Sistemi</div>
-      <div class="ms-desc">Malzeme toplama, kombinasyon tarifleri, envanter UI. Tezgah gerektirmez. Erken: sopa/meşale. Geç: metal balta, molotof.</div>
-    </div>
-  </div>
-
-  <div class="milestone">
-    <span class="num">12</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">İkinci Yaratık: Gözlemci</div>
-      <div class="ms-desc">Işığa tepki verir. El feneri veya ışıklı ortamda yaklaşır.</div>
-    </div>
-  </div>
-
-  <div class="milestone">
-    <span class="num">13</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Üs / Sığınak Kurma</div>
-      <div class="ms-desc">Mobilya taşıyıp yerleştirerek güvenli alan oluşturma. Gece için kritik.</div>
-    </div>
-  </div>
-
-  <p class="phase-label">🟦 Faz 5 — Co-op</p>
-
-  <div class="milestone">
-    <span class="num">14</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Co-op Ağ Katmanı (NGO)</div>
-      <div class="ms-desc">Netcode for GameObjects entegrasyonu. Host/Client. Farklı noktada spawn. 1–6 kişi.</div>
-    </div>
-  </div>
-
-  <div class="milestone">
-    <span class="num">15</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Proximity Voice Chat</div>
-      <div class="ms-desc">Yakındaki net, uzaktaki zayıf duyulur. Paket oturumda seçilecek.</div>
-    </div>
-  </div>
-
-  <p class="phase-label">⬜ Faz 6 — Derinlik ve Cila</p>
-
-  <div class="milestone">
-    <span class="num">16</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Üçüncü Yaratık: Avcı</div>
-      <div class="ms-desc">Harekete tepki verir. Koşarsan kovalar, yavaş yürürsen görmez.</div>
-    </div>
-  </div>
-
-  <div class="milestone">
-    <span class="num">17</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Sütun Bilgisayarı + Koordinat Sistemi</div>
-      <div class="ms-desc">Gece aktif. A1/B3/G7 koordinatı, ipucu verir. Oyuncuların buluşmasını kolaylaştırır.</div>
-    </div>
-  </div>
-
-  <div class="milestone">
-    <span class="num">18</span>
-    <span class="badge todo">TODO</span>
-    <div class="ms-body">
-      <div class="ms-title">Giriş Hikayesi + Ölüm/Respawn + Platform Göstergesi</div>
-      <div class="ms-desc">İlk girişte SCP hikaye ekranı. Ölünce farklı noktada spawn. İsim üstünde PC/mobil/tablet tag.</div>
-    </div>
-  </div>
-</section>
-
-<!-- MİMARİ KARARLAR -->
-<section>
-  <h2>Mimari Kararlar</h2>
-  <div class="decision-box"><strong>Ağ:</strong> Netcode for GameObjects — 5–6 kişi max, Unity Relay entegrasyonu kolay.</div>
-  <div class="decision-box"><strong>Karakter Fizik:</strong> CharacterController — Rigidbody değil. Öngörülebilir FPS hareketi.</div>
-  <div class="decision-box"><strong>Input:</strong> Direkt Keyboard.current / Mouse.current API (generated class gerektirmez).</div>
-  <div class="decision-box"><strong>Chunk Sistemi:</strong> Object Pooling — Instantiate/Destroy yok. Chunk reset = loot ve layout yeniden üretimi.</div>
-  <div class="decision-box"><strong>Proximity VC:</strong> Paket seçimi faz 5'te yapılacak (Vivox vs Dissonance vs Photon Voice).</div>
-</section>
-
-<!-- BUGLAR -->
-<section>
-  <h2>Bilinen Buglar</h2>
-  <ul class="bug-list">
-    <li>Slider handle'ları ekranda görünüyor — kozmetik, sonra düzeltilecek. <span style="color:var(--muted);font-size:0.75rem;">28 Haz 2026</span></li>
-  </ul>
-</section>
-
-<footer>SCP-3008 · 2026</footer>
 </body>
 </html>

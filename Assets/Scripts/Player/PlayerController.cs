@@ -84,7 +84,10 @@ public class PlayerController : MonoBehaviour
         float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
         float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
 
-        bool sprinting = kb.leftShiftKey.isPressed;
+        bool wantsSprint = kb.leftShiftKey.isPressed;
+        bool canSprint = statsController == null || statsController.CanSprint;
+        bool sprinting = wantsSprint && canSprint;
+
         float statMult = statsController != null ? statsController.SpeedMultiplier : 1f;
         float speed = (isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed)) * statMult;
 

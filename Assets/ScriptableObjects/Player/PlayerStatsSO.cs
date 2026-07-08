@@ -14,6 +14,11 @@ public class PlayerStatsSO : ScriptableObject
     public float waterDecayRate      = 1.3f; // su, açlıktan biraz daha hızlı azalır (pasif)
     public float sprintWaterDrainRate = 2f;  // koşarken suya ek olarak eklenen azalma
 
+    [Header("Stamina (Koşma) — TASLAK, sonra ayarlanacak")]
+    public float maxStamina        = 100f;
+    public float staminaDrainRate  = 20f; // koşarken saniyede azalma
+    public float staminaRegenRate  = 15f; // koşmazken saniyede dolma
+
     [Header("Açlıktan Can Kaybı")]
     public float healthDecayWhenStarving = 2f; // hunger 0 olunca saniyede bu kadar can gider
 
