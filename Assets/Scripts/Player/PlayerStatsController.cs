@@ -22,10 +22,12 @@ public class PlayerStatsController : MonoBehaviour
     // Su durumuna göre PlayerController hız çarpanı alır
     public float SpeedMultiplier => CurrentWater > 0f ? 1f : stats.lowWaterSpeedMultiplier;
 
-    // Stamina eşiğin altına düşünce koşma kilitlenir; eşiğe geri çıkana kadar açılmaz
-    public bool CanSprint => CurrentStamina / stats.maxStamina >= stats.staminaSprintThreshold;
+    // Kilitliyken (Shift'i eşiğin altındayken bıraktıysa) koşamaz; eşiğe çıkınca açılır
+    public bool CanSprint => !isStaminaLocked && CurrentStamina > 0f;
 
     private bool isDead;
+    private bool isStaminaLocked;
+    private bool wasSprintKeyHeldLastFrame;
     private float lastSprintTime = -999f;
 
     private void Start()
@@ -53,8 +55,22 @@ public class PlayerStatsController : MonoBehaviour
     {
         ChangeHunger(-stats.hungerDecayRate * Time.deltaTime);
 
-        // Koşma isteği var ama eşiğin altındaysa artık koşamaz sayılır
-        bool isSprinting = Keyboard.current.leftShiftKey.isPressed && CanSprint;
+        bool wantsSprint = Keyboard.current.leftShiftKey.isPressed;
+        float staminaFraction = CurrentStamina / stats.maxStamina;
+
+        // Eşiğe ulaşıldıysa kilidi kaldır
+        if (isStaminaLocked && staminaFraction >= stats.staminaSprintThreshold)
+            isStaminaLocked = false;
+
+        // Stamina tamamen bittiyse VEYA eşiğin altındayken Shift bırakıldıysa kilitle
+        // (basılı tutulduğu sürece 0'a kadar düşebilir, kesilmez)
+        bool releasedBelowThreshold = wasSprintKeyHeldLastFrame && !wantsSprint && staminaFraction < stats.staminaSprintThreshold;
+        if (CurrentStamina <= 0f || releasedBelowThreshold)
+            isStaminaLocked = true;
+
+        wasSprintKeyHeldLastFrame = wantsSprint;
+
+        bool isSprinting = wantsSprint && CanSprint;
 
         if (isSprinting)
         {

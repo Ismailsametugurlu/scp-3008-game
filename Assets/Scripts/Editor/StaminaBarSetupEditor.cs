@@ -35,8 +35,9 @@ public static class StaminaBarSetupEditor
         rootRT.anchoredPosition = new Vector2(0f, 40f);
         rootRT.sizeDelta = new Vector2(0f, 3f);
 
-        RectTransform leftBar  = CreateBarHalf(barRoot.transform, "LeftBar", pivotX: 1f);
-        RectTransform rightBar = CreateBarHalf(barRoot.transform, "RightBar", pivotX: 0f);
+        // isLeftHalf: merkeze bakan iç kenarda çerçeve yok, iki yarı ortada kesintisiz birleşsin
+        RectTransform leftBar  = CreateBarHalf(barRoot.transform, "LeftBar", pivotX: 1f, isLeftHalf: true);
+        RectTransform rightBar = CreateBarHalf(barRoot.transform, "RightBar", pivotX: 0f, isLeftHalf: false);
 
         StaminaBarUI barUI = barRoot.AddComponent<StaminaBarUI>();
         var so = new SerializedObject(barUI);
@@ -51,8 +52,8 @@ public static class StaminaBarSetupEditor
     }
 
     // Dış obje siyah (çerçeve), içine anchor-stretch ile inset edilmiş beyaz "Fill" çocuğu konur.
-    // Böylece dış obje büyüyüp küçülürken çerçeve kalınlığı her zaman sabit kalır (vertex patlaması yok).
-    private static RectTransform CreateBarHalf(Transform parent, string name, float pivotX)
+    // Merkeze bakan iç kenarda inset uygulanmaz ki iki yarı ortada kesintisiz (tek bar gibi) birleşsin.
+    private static RectTransform CreateBarHalf(Transform parent, string name, float pivotX, bool isLeftHalf)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
         go.transform.SetParent(parent, false);
@@ -72,8 +73,12 @@ public static class StaminaBarSetupEditor
         RectTransform fillRT = fill.GetComponent<RectTransform>();
         fillRT.anchorMin = Vector2.zero;
         fillRT.anchorMax = Vector2.one;
-        fillRT.offsetMin = new Vector2(BorderThickness, BorderThickness);
-        fillRT.offsetMax = new Vector2(-BorderThickness, -BorderThickness);
+
+        // LeftBar'ın iç kenarı sağı (offsetMax.x), RightBar'ın iç kenarı solu (offsetMin.x) — orada inset 0
+        float leftInset  = isLeftHalf ? BorderThickness : 0f;
+        float rightInset = isLeftHalf ? 0f : BorderThickness;
+        fillRT.offsetMin = new Vector2(leftInset, BorderThickness);
+        fillRT.offsetMax = new Vector2(-rightInset, -BorderThickness);
 
         fill.GetComponent<Image>().color = Color.white;
 
