@@ -1,47 +1,64 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Yakındaki yenilebilir/içilebilir eşyaları bulur; E'ye basılı tutunca tüketir
+// E: yakındaki eşyayı anında envantere alır. Sağ tık (basılı tut): elde tutulanı tüketir.
 public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private float interactRange = 2.5f;
-    [SerializeField] private float interactHoldDuration = 1.5f; // TASLAK, sonra ayarlanacak (kitap okuma da bunu kullanacak)
+    [SerializeField] private float eatHoldDuration = 1.5f; // TASLAK, sonra ayarlanacak (kitap okuma da bunu kullanacak)
 
     private PlayerStatsController stats;
-    private ConsumableItem currentTarget;
+    private PlayerInventory inventory;
     private float holdTimer;
+
+    // UI (dairesel gösterge) bunları okur
+    public bool IsEating { get; private set; }
+    public float EatProgress01 => Mathf.Clamp01(holdTimer / eatHoldDuration);
+    public ConsumableType? CurrentEatType { get; private set; }
 
     private void Awake()
     {
         stats = GetComponent<PlayerStatsController>();
+        inventory = GetComponent<PlayerInventory>();
     }
 
     private void Update()
     {
-        ConsumableItem nearest = FindNearestConsumable();
+        HandlePickup();
+        HandleEat();
+    }
 
-        // Hedef değiştiyse sayaç sıfırlanır (başka eşyaya geçince baştan başlar)
-        if (nearest != currentTarget)
-        {
-            currentTarget = nearest;
-            holdTimer = 0f;
-        }
+    // E'ye basınca (basılı tutmadan) en yakın eşyayı anında envantere alır
+    private void HandlePickup()
+    {
+        if (!Keyboard.current.eKey.wasPressedThisFrame) return;
 
-        if (currentTarget == null) return;
+        ConsumableItem item = FindNearestConsumable();
+        if (item != null) item.PickUp(inventory);
+    }
 
-        if (Keyboard.current.eKey.isPressed)
-        {
-            holdTimer += Time.deltaTime;
-            if (holdTimer >= interactHoldDuration)
-            {
-                currentTarget.Consume(stats);
-                currentTarget = null;
-                holdTimer = 0f;
-            }
-        }
-        else
+    // Sağ tık basılı tutulunca elde tutulan eşya (önce yemek, sonra su) tüketilir
+    private void HandleEat()
+    {
+        bool hasAnything = inventory.HasFood || inventory.HasWater;
+        bool wantsEat = Mouse.current.rightButton.isPressed && hasAnything;
+
+        if (!wantsEat)
         {
             holdTimer = 0f;
+            IsEating = false;
+            return;
+        }
+
+        CurrentEatType = inventory.HasFood ? ConsumableType.Food : ConsumableType.Water;
+        IsEating = true;
+        holdTimer += Time.deltaTime;
+
+        if (holdTimer >= eatHoldDuration)
+        {
+            inventory.TryConsume(CurrentEatType.Value, stats);
+            holdTimer = 0f;
+            IsEating = false;
         }
     }
 

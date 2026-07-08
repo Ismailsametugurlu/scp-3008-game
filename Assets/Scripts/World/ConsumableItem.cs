@@ -2,19 +2,15 @@ using UnityEngine;
 
 public enum ConsumableType { Food, Water }
 
-// Sahnedeki yenilebilir/içilebilir eşya. Küpe eklenir, Inspector'dan tip ve miktar ayarlanır.
+// Sahnedeki alınabilir yemek/su. E ile anında envantere eklenir (elde tutmak için).
 public class ConsumableItem : MonoBehaviour
 {
     [SerializeField] private ConsumableType type;
     [SerializeField] private float amount = 20f;
 
-    public void Consume(PlayerStatsController stats)
+    public void PickUp(PlayerInventory inventory)
     {
-        if (type == ConsumableType.Food)
-            stats.Eat(amount);
-        else
-            stats.Drink(amount);
-
+        inventory.Add(type, amount);
         Destroy(gameObject);
     }
 }
