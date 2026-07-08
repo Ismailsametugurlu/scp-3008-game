@@ -11,6 +11,9 @@ public class StaminaBarUI : MonoBehaviour
 
     [Header("Görünüm")]
     [SerializeField] private float maxHalfWidth = 220f; // tam dolu haldeki tek yarının genişliği
+    [SerializeField] private float fadeDuration = 1f;   // görünür/gizli geçiş süresi (saniye)
+
+    private float targetAlpha;
 
     private void OnEnable()
     {
@@ -29,8 +32,14 @@ public class StaminaBarUI : MonoBehaviour
         SetWidth(leftBar, width);
         SetWidth(rightBar, width);
 
-        // Tam doluyken gizle, azalır azalmaz göster
-        canvasGroup.alpha = normalized >= 0.999f ? 0f : 1f;
+        // Tam doluyken hedef 0 (gizlen), azalır azalmaz hedef 1 (görün) — geçiş Update'te yumuşatılır
+        targetAlpha = normalized >= 0.999f ? 0f : 1f;
+    }
+
+    // Opaklığı hedefe doğru fadeDuration saniyede yumuşakça taşır (ani kesme yok)
+    private void Update()
+    {
+        canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, targetAlpha, Time.deltaTime / fadeDuration);
     }
 
     private void SetWidth(RectTransform rt, float width)

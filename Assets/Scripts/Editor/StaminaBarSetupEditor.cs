@@ -6,16 +6,25 @@ using UnityEditor.SceneManagement;
 // Stamina bar UI hiyerarşisini tek tıkla oluşturur: Tools > SCP3008 > Stamina Bar UI Kur
 public static class StaminaBarSetupEditor
 {
+    // İnce siyah çerçeve için 8 yönde Outline eklenir (Unity'de tek seferde tam çerçeve component'i yok)
+    private static readonly Vector2[] OutlineOffsets =
+    {
+        new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1),
+        new Vector2(1, 1), new Vector2(1, -1), new Vector2(-1, 1), new Vector2(-1, -1)
+    };
+
     [MenuItem("Tools/SCP3008/Stamina Bar UI Kur")]
     public static void SetupStaminaBar()
     {
         Canvas canvas = Object.FindFirstObjectByType<Canvas>();
         if (canvas == null) { Debug.LogError("[StaminaBarSetup] Sahnede Canvas yok."); return; }
 
-        if (canvas.transform.Find("StaminaBar") != null)
+        // Zaten varsa sil, güncel haliyle yeniden kur
+        Transform existing = canvas.transform.Find("StaminaBar");
+        if (existing != null)
         {
-            Debug.LogWarning("[StaminaBarSetup] StaminaBar zaten var, iptal edildi.");
-            return;
+            Object.DestroyImmediate(existing.gameObject);
+            Debug.Log("[StaminaBarSetup] Var olan StaminaBar silindi, güncel haliyle yeniden kuruluyor.");
         }
 
         PlayerStatsController stats = Object.FindFirstObjectByType<PlayerStatsController>();
@@ -59,6 +68,14 @@ public static class StaminaBarSetupEditor
         rt.sizeDelta = new Vector2(0f, 3f);
 
         go.GetComponent<Image>().color = Color.white;
+
+        foreach (Vector2 offset in OutlineOffsets)
+        {
+            Outline outline = go.AddComponent<Outline>();
+            outline.effectColor = Color.black;
+            outline.effectDistance = offset;
+        }
+
         return rt;
     }
 }
