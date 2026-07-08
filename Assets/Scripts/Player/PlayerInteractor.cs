@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// E: yakındaki eşyayı anında envantere alır. Sağ tık (basılı tut): elde tutulanı tüketir.
+// E: yakındaki eşyayı anında envantere alır. Sağ tık (basılı tut): seçili hotbar eşyasını tüketir.
 public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private float interactRange = 2.5f;
-    [SerializeField] private float eatHoldDuration = 1.5f; // TASLAK, sonra ayarlanacak (kitap okuma da bunu kullanacak)
+    [SerializeField] private float eatHoldDuration = 1.5f; // TASLAK (kitap okuma da bunu kullanacak)
 
     private PlayerStatsController stats;
     private PlayerInventory inventory;
@@ -28,7 +28,7 @@ public class PlayerInteractor : MonoBehaviour
         HandleEat();
     }
 
-    // E'ye basınca (basılı tutmadan) en yakın eşyayı anında envantere alır
+    // E'ye basınca en yakın eşyayı anında envantere alır (dolu değilse)
     private void HandlePickup()
     {
         if (!Keyboard.current.eKey.wasPressedThisFrame) return;
@@ -37,26 +37,27 @@ public class PlayerInteractor : MonoBehaviour
         if (item != null) item.PickUp(inventory);
     }
 
-    // Sağ tık basılı tutulunca elde tutulan eşya (önce yemek, sonra su) tüketilir
+    // Sağ tık basılı tutulunca seçili hotbar eşyası tüketilir
     private void HandleEat()
     {
-        bool hasAnything = inventory.HasFood || inventory.HasWater;
-        bool wantsEat = Mouse.current.rightButton.isPressed && hasAnything;
+        ItemStack held = inventory.HeldItem;
+        bool wantsEat = Mouse.current.rightButton.isPressed && !held.isEmpty;
 
         if (!wantsEat)
         {
             holdTimer = 0f;
             IsEating = false;
+            CurrentEatType = null;
             return;
         }
 
-        CurrentEatType = inventory.HasFood ? ConsumableType.Food : ConsumableType.Water;
+        CurrentEatType = held.type;
         IsEating = true;
         holdTimer += Time.deltaTime;
 
         if (holdTimer >= eatHoldDuration)
         {
-            inventory.TryConsume(CurrentEatType.Value, stats);
+            inventory.ConsumeSelected(stats);
             holdTimer = 0f;
             IsEating = false;
         }

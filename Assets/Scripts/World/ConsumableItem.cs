@@ -10,7 +10,8 @@ public class ConsumableItem : MonoBehaviour
 
     public void PickUp(PlayerInventory inventory)
     {
-        inventory.Add(type, amount);
-        Destroy(gameObject);
+        // Envanter doluysa alınmaz, eşya sahnede kalır
+        if (inventory.Add(type, amount))
+            Destroy(gameObject);
     }
 }
