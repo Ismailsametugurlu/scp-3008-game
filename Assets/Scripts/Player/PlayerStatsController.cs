@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // Sağlık, açlık ve su değerlerini yönetir; değişince event fırlatır
 public class PlayerStatsController : MonoBehaviour
@@ -35,9 +34,12 @@ public class PlayerStatsController : MonoBehaviour
     public float MuscleStaminaMultiplier => 1f - (CurrentMuscleLevel * stats.staminaCostReductionPerMuscleLevel);
     public float MuscleDamageMultiplier  => 1f + (CurrentMuscleLevel * stats.damageBonusPerMuscleLevel);
 
+    // PlayerController her frame gerçek koşma durumunu (Shift + hareket + çömelme yok) buraya yazar
+    public bool IsActivelySprinting { get; set; }
+
     private bool isDead;
     private bool isStaminaLocked;
-    private bool wasSprintKeyHeldLastFrame;
+    private bool wasActivelySprintingLastFrame;
     private float lastSprintTime = -999f;
     private float intelligenceProgress; // 0-1, mevcut zeka seviyesi içindeki ilerleme
     private float muscleProgress;       // 0-1, mevcut kas seviyesi içindeki ilerleme
@@ -71,22 +73,21 @@ public class PlayerStatsController : MonoBehaviour
     {
         ChangeHunger(-stats.hungerDecayRate * Time.deltaTime);
 
-        bool wantsSprint = Keyboard.current.leftShiftKey.isPressed;
+        // Stamina yalnızca gerçekten koşarken (hareket + Shift) tükenir — dururken Shift boşa harcamaz
+        bool isSprinting = IsActivelySprinting;
         float staminaFraction = CurrentStamina / stats.maxStamina;
 
         // Eşiğe ulaşıldıysa kilidi kaldır
         if (isStaminaLocked && staminaFraction >= stats.staminaSprintThreshold)
             isStaminaLocked = false;
 
-        // Stamina tamamen bittiyse VEYA eşiğin altındayken Shift bırakıldıysa kilitle
-        // (basılı tutulduğu sürece 0'a kadar düşebilir, kesilmez)
-        bool releasedBelowThreshold = wasSprintKeyHeldLastFrame && !wantsSprint && staminaFraction < stats.staminaSprintThreshold;
+        // Stamina tamamen bittiyse VEYA eşiğin altındayken koşma bırakıldıysa kilitle
+        // (koşmaya devam edildiği sürece 0'a kadar düşebilir, kesilmez)
+        bool releasedBelowThreshold = wasActivelySprintingLastFrame && !isSprinting && staminaFraction < stats.staminaSprintThreshold;
         if (CurrentStamina <= 0f || releasedBelowThreshold)
             isStaminaLocked = true;
 
-        wasSprintKeyHeldLastFrame = wantsSprint;
-
-        bool isSprinting = wantsSprint && CanSprint;
+        wasActivelySprintingLastFrame = isSprinting;
 
         if (isSprinting)
         {

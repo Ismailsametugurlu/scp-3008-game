@@ -10,7 +10,7 @@ public static class HotbarSetupEditor
     private const int SlotCount = 3; // PlayerInventory.pocketSlots ile aynı olmalı
     private const float SlotSize = 56f;
     private const float SlotGap = 8f;
-    private const float BottomOffset = 24f;
+    private const float BottomOffset = 90f; // stamina çizgisinin (y~40) üstünde kalsın
 
     [MenuItem("Tools/SCP3008/Hotbar UI Kur")]
     public static void SetupHotbar()

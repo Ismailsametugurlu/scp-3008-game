@@ -84,9 +84,14 @@ public class PlayerController : MonoBehaviour
         float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
         float z = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
 
+        bool isMoving = Mathf.Abs(x) > 0.01f || Mathf.Abs(z) > 0.01f;
         bool wantsSprint = kb.leftShiftKey.isPressed;
         bool canSprint = statsController == null || statsController.CanSprint;
-        bool sprinting = wantsSprint && canSprint;
+        // Gerçek koşma: Shift + hareket var + çömelme yok + stamina izin veriyor
+        bool sprinting = wantsSprint && canSprint && isMoving && !isCrouching;
+
+        // Stamina sistemi bu gerçek durumu kullanır (dururken Shift boşa harcamaz)
+        if (statsController != null) statsController.IsActivelySprinting = sprinting;
 
         float statMult = statsController != null ? statsController.SpeedMultiplier : 1f;
         float speed = (isCrouching ? crouchSpeed : (sprinting ? runSpeed : walkSpeed)) * statMult;
