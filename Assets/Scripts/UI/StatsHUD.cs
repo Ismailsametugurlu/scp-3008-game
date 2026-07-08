@@ -6,7 +6,7 @@ public class StatsHUD : MonoBehaviour
 {
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Slider hungerSlider;
-    [SerializeField] private Slider energySlider;
+    [SerializeField] private Slider waterSlider;
 
     [SerializeField] private PlayerStatsController statsController;
 
@@ -14,17 +14,17 @@ public class StatsHUD : MonoBehaviour
     {
         statsController.OnHealthChanged += SetHealth;
         statsController.OnHungerChanged += SetHunger;
-        statsController.OnEnergyChanged += SetEnergy;
+        statsController.OnWaterChanged  += SetWater;
     }
 
     private void OnDisable()
     {
         statsController.OnHealthChanged -= SetHealth;
         statsController.OnHungerChanged -= SetHunger;
-        statsController.OnEnergyChanged -= SetEnergy;
+        statsController.OnWaterChanged  -= SetWater;
     }
 
     private void SetHealth(float v) => healthSlider.value = v;
     private void SetHunger(float v) => hungerSlider.value = v;
-    private void SetEnergy(float v) => energySlider.value = v;
+    private void SetWater(float v)  => waterSlider.value = v;
 }

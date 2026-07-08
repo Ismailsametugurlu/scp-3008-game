@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-// Sağlık, açlık ve enerji değerlerini yönetir; değişince event fırlatır
+// Sağlık, açlık ve su değerlerini yönetir; değişince event fırlatır
 public class PlayerStatsController : MonoBehaviour
 {
     [SerializeField] private PlayerStatsSO stats;
@@ -9,15 +10,15 @@ public class PlayerStatsController : MonoBehaviour
     // UI ve diğer sistemler bu event'leri dinler (0-1 arası normalize değer gönderir)
     public event Action<float> OnHealthChanged;
     public event Action<float> OnHungerChanged;
-    public event Action<float> OnEnergyChanged;
+    public event Action<float> OnWaterChanged;
     public event Action OnPlayerDied;
 
-    public float CurrentHealth  { get; private set; }
-    public float CurrentHunger  { get; private set; }
-    public float CurrentEnergy  { get; private set; }
+    public float CurrentHealth { get; private set; }
+    public float CurrentHunger { get; private set; }
+    public float CurrentWater  { get; private set; }
 
-    // Enerji durumuna göre PlayerController hız çarpanı alır
-    public float SpeedMultiplier => CurrentEnergy > 0f ? 1f : stats.lowEnergySpeedMultiplier;
+    // Su durumuna göre PlayerController hız çarpanı alır
+    public float SpeedMultiplier => CurrentWater > 0f ? 1f : stats.lowWaterSpeedMultiplier;
 
     private bool isDead;
 
@@ -25,12 +26,12 @@ public class PlayerStatsController : MonoBehaviour
     {
         CurrentHealth = stats.maxHealth;
         CurrentHunger = stats.maxHunger;
-        CurrentEnergy = stats.maxEnergy;
+        CurrentWater  = stats.maxWater;
 
         // Başlangıç UI güncellemesi
         OnHealthChanged?.Invoke(CurrentHealth / stats.maxHealth);
         OnHungerChanged?.Invoke(CurrentHunger / stats.maxHunger);
-        OnEnergyChanged?.Invoke(CurrentEnergy / stats.maxEnergy);
+        OnWaterChanged?.Invoke(CurrentWater / stats.maxWater);
     }
 
     private void Update()
@@ -39,11 +40,14 @@ public class PlayerStatsController : MonoBehaviour
         DecayStats();
     }
 
-    // Her frame'de açlık ve enerjiyi düşür; açlık sıfırsa can al
+    // Her frame'de açlık ve suyu düşür; koşarken su ekstra azalır; açlık sıfırsa can al
     private void DecayStats()
     {
         ChangeHunger(-stats.hungerDecayRate * Time.deltaTime);
-        ChangeEnergy(-stats.energyDecayRate * Time.deltaTime);
+
+        bool isSprinting = Keyboard.current.leftShiftKey.isPressed;
+        float waterDrain = stats.waterDecayRate + (isSprinting ? stats.sprintWaterDrainRate : 0f);
+        ChangeWater(-waterDrain * Time.deltaTime);
 
         if (CurrentHunger <= 0f)
             ChangeHealth(-stats.healthDecayWhenStarving * Time.deltaTime);
@@ -68,10 +72,10 @@ public class PlayerStatsController : MonoBehaviour
         OnHungerChanged?.Invoke(CurrentHunger / stats.maxHunger);
     }
 
-    public void ChangeEnergy(float amount)
+    public void ChangeWater(float amount)
     {
-        CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, stats.maxEnergy);
-        OnEnergyChanged?.Invoke(CurrentEnergy / stats.maxEnergy);
+        CurrentWater = Mathf.Clamp(CurrentWater + amount, 0f, stats.maxWater);
+        OnWaterChanged?.Invoke(CurrentWater / stats.maxWater);
     }
 
     // Yemek yenince çağrılır (ilerleyen oturumda yemek sistemi bağlar)
@@ -79,5 +83,11 @@ public class PlayerStatsController : MonoBehaviour
     {
         ChangeHunger(hungerAmount);
         if (healthAmount > 0f) ChangeHealth(healthAmount);
+    }
+
+    // Su içilince çağrılır (ilerleyen oturumda su/içecek sistemi bağlar)
+    public void Drink(float waterAmount)
+    {
+        ChangeWater(waterAmount);
     }
 }
