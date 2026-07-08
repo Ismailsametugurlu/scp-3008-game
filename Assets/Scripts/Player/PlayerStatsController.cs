@@ -26,6 +26,7 @@ public class PlayerStatsController : MonoBehaviour
     public bool CanSprint => CurrentStamina > 0f;
 
     private bool isDead;
+    private float lastSprintTime = -999f;
 
     private void Start()
     {
@@ -55,8 +56,16 @@ public class PlayerStatsController : MonoBehaviour
         // Koşma isteği var ama stamina bittiyse artık koşamaz sayılır
         bool isSprinting = Keyboard.current.leftShiftKey.isPressed && CurrentStamina > 0f;
 
-        ChangeStamina(isSprinting ? -stats.staminaDrainRate * Time.deltaTime
-                                   :  stats.staminaRegenRate * Time.deltaTime);
+        if (isSprinting)
+        {
+            lastSprintTime = Time.time;
+            ChangeStamina(-stats.staminaDrainRate * Time.deltaTime);
+        }
+        else if (Time.time - lastSprintTime >= stats.staminaRegenDelay)
+        {
+            // Koşma bırakılalı yeterince zaman geçtiyse dolmaya başla (aniden dolmasın)
+            ChangeStamina(stats.staminaRegenRate * Time.deltaTime);
+        }
 
         float waterDrain = stats.waterDecayRate + (isSprinting ? stats.sprintWaterDrainRate : 0f);
         ChangeWater(-waterDrain * Time.deltaTime);

@@ -17,7 +17,8 @@ public class PlayerStatsSO : ScriptableObject
     [Header("Stamina (Koşma) — TASLAK, sonra ayarlanacak")]
     public float maxStamina        = 100f;
     public float staminaDrainRate  = 20f; // koşarken saniyede azalma
-    public float staminaRegenRate  = 15f; // koşmazken saniyede dolma
+    public float staminaRegenRate  = 15f; // bekleme bitince saniyede dolma
+    public float staminaRegenDelay = 1.5f; // koşma bırakılınca dolmaya başlamadan önceki bekleme (korku gerilimi için)
 
     [Header("Açlıktan Can Kaybı")]
     public float healthDecayWhenStarving = 2f; // hunger 0 olunca saniyede bu kadar can gider
