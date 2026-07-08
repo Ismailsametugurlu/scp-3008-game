@@ -6,12 +6,7 @@ using UnityEditor.SceneManagement;
 // Stamina bar UI hiyerarşisini tek tıkla oluşturur: Tools > SCP3008 > Stamina Bar UI Kur
 public static class StaminaBarSetupEditor
 {
-    // İnce siyah çerçeve için 8 yönde Outline eklenir (Unity'de tek seferde tam çerçeve component'i yok)
-    private static readonly Vector2[] OutlineOffsets =
-    {
-        new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1),
-        new Vector2(1, 1), new Vector2(1, -1), new Vector2(-1, 1), new Vector2(-1, -1)
-    };
+    private const float BorderThickness = 1f; // siyah çerçeve kalınlığı (px)
 
     [MenuItem("Tools/SCP3008/Stamina Bar UI Kur")]
     public static void SetupStaminaBar()
@@ -55,6 +50,8 @@ public static class StaminaBarSetupEditor
         Debug.Log("[StaminaBarSetup] StaminaBar UI oluşturuldu.");
     }
 
+    // Dış obje siyah (çerçeve), içine anchor-stretch ile inset edilmiş beyaz "Fill" çocuğu konur.
+    // Böylece dış obje büyüyüp küçülürken çerçeve kalınlığı her zaman sabit kalır (vertex patlaması yok).
     private static RectTransform CreateBarHalf(Transform parent, string name, float pivotX)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
@@ -67,14 +64,18 @@ public static class StaminaBarSetupEditor
         rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta = new Vector2(0f, 3f);
 
-        go.GetComponent<Image>().color = Color.white;
+        go.GetComponent<Image>().color = Color.black;
 
-        foreach (Vector2 offset in OutlineOffsets)
-        {
-            Outline outline = go.AddComponent<Outline>();
-            outline.effectColor = Color.black;
-            outline.effectDistance = offset;
-        }
+        GameObject fill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+        fill.transform.SetParent(go.transform, false);
+
+        RectTransform fillRT = fill.GetComponent<RectTransform>();
+        fillRT.anchorMin = Vector2.zero;
+        fillRT.anchorMax = Vector2.one;
+        fillRT.offsetMin = new Vector2(BorderThickness, BorderThickness);
+        fillRT.offsetMax = new Vector2(-BorderThickness, -BorderThickness);
+
+        fill.GetComponent<Image>().color = Color.white;
 
         return rt;
     }
