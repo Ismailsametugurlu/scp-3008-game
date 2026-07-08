@@ -256,14 +256,34 @@
     <thead><tr><th>Özellik</th><th>Kod</th><th>Animasyon</th><th>Model</th><th>UI</th><th>Ses</th><th>Durum</th></tr></thead>
     <tbody>
       <tr>
-        <td><div class="feat-name">Sağlık / Açlık / Su</div><div class="feat-sub">PlayerStatsSO + Controller · zamanla azalma · açlıktan can kaybı · su bitince yavaşlama · event-tabanlı UI · dairesel gauge (The Forest tarzı, ikon yer tutucu metin) · (eski "Enerji" → Su/susuzluk oldu)</div></td>
+        <td><div class="feat-name">Sağlık / Açlık / Su</div><div class="feat-sub">PlayerStatsSO + Controller · zamanla azalma · açlıktan can kaybı · su bitince yavaşlama · event-tabanlı UI · (eski "Enerji" → Su/susuzluk oldu)</div></td>
         <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
         <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
       </tr>
       <tr>
-        <td><div class="feat-name">Stamina Sistemi</div><div class="feat-sub">koşma süresini sınırlar · bitince koşamazsın · koşarken suyu da ekstra tüketir · UI: alt-orta merkezde ince beyaz çizgi, doluyken gizli, merkezden aynalı şekilde sağ/sol eşit hızda büyür-küçülür &nbsp;<span class="chip">özgün fikir</span></div></td>
-        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟡</td><td class="cell-icon">➖</td>
-        <td><span class="badge badge-partial">🟡 Sayılar taslak</span></td>
+        <td><div class="feat-name">Stamina Sistemi</div><div class="feat-sub">koşma süresini sınırlar · %35 altına düşünce Shift bırakılırsa kilitlenir, %35'e çıkana kadar açılmaz · basılı tutulursa %0'a kadar kesilmeden düşer · UI: alt-orta merkezde ince beyaz çizgi + siyah çerçeve, doluyken gizli, merkezden aynalı büyür-küçülür &nbsp;<span class="chip">özgün fikir</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Uyku / Enerji</div><div class="feat-sub">uyanık kaldıkça azalır · uyuma veya enerji verici öğeyle dolar (sistem hazır, uyku/enerji öğesi etkileşimi bekliyor) &nbsp;<span class="chip">özgün fikir</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-partial">🟡 Etkileşim bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Zeka (5 Seviye)</div><div class="feat-sub">kitap okuyunca artar (yemek yeme süresiyle eşlenecek sağ-tık-basılı-tut) · 5. seviyede altın renk · seviye arttıkça daha fazla malzeme craftlanabilir (crafting sistemi bekliyor) &nbsp;<span class="chip">özgün fikir</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-partial">🟡 Kitap etkileşimi bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Kas (5 Seviye)</div><div class="feat-sub">koşarken otomatik artar (aktif) · vurunca da artacak (dövüş sistemi bekliyor) · seviye arttıkça koşma stamina maliyeti düşer (aktif), vuruş hasarı artar (dövüş sistemi bekliyor) &nbsp;<span class="chip">The Forest</span></div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-partial">🟡 Dövüş entegrasyonu bekliyor</span></td>
+      </tr>
+      <tr>
+        <td><div class="feat-name">Survival HUD (Dairesel)</div><div class="feat-sub">büyük Can dairesi sol altta, 5 küçük rozet (Su/Açlık/Uyku/Kas/Zeka) Can dairesinin 0°-90° yayında · yarı opak arka plan + renkli halka + ikon yer tutucu metin</div></td>
+        <td class="cell-icon">🟢</td><td class="cell-icon">➖</td><td class="cell-icon">➖</td><td class="cell-icon">🟢</td><td class="cell-icon">➖</td>
+        <td><span class="badge badge-done">🟢 Tamamlandı</span></td>
       </tr>
       <tr>
         <td><div class="feat-name">Yemek Toplama + Yeme</div><div class="feat-sub">E tuşu · Hunger doldurma · yemek keşifle bulunur &nbsp;<span class="chip">SCP-3008</span></div></td>

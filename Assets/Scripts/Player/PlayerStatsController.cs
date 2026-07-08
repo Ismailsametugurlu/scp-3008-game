@@ -12,12 +12,18 @@ public class PlayerStatsController : MonoBehaviour
     public event Action<float> OnHungerChanged;
     public event Action<float> OnWaterChanged;
     public event Action<float> OnStaminaChanged;
+    public event Action<float> OnSleepEnergyChanged;
+    public event Action<int, float> OnIntelligenceChanged; // seviye, mevcut seviye içindeki ilerleme (0-1)
+    public event Action<int, float> OnMuscleChanged;       // seviye, mevcut seviye içindeki ilerleme (0-1)
     public event Action OnPlayerDied;
 
-    public float CurrentHealth  { get; private set; }
-    public float CurrentHunger  { get; private set; }
-    public float CurrentWater   { get; private set; }
-    public float CurrentStamina { get; private set; }
+    public float CurrentHealth      { get; private set; }
+    public float CurrentHunger      { get; private set; }
+    public float CurrentWater       { get; private set; }
+    public float CurrentStamina     { get; private set; }
+    public float CurrentSleepEnergy { get; private set; }
+    public int   CurrentIntelligenceLevel { get; private set; }
+    public int   CurrentMuscleLevel       { get; private set; }
 
     // Su durumuna göre PlayerController hız çarpanı alır
     public float SpeedMultiplier => CurrentWater > 0f ? 1f : stats.lowWaterSpeedMultiplier;
@@ -25,23 +31,33 @@ public class PlayerStatsController : MonoBehaviour
     // Kilitliyken (Shift'i eşiğin altındayken bıraktıysa) koşamaz; eşiğe çıkınca açılır
     public bool CanSprint => !isStaminaLocked && CurrentStamina > 0f;
 
+    // Kas seviyesi arttıkça koşma stamina maliyeti düşer, vuruş hasarı artar (dövüş sistemi ileride kullanır)
+    public float MuscleStaminaMultiplier => 1f - (CurrentMuscleLevel * stats.staminaCostReductionPerMuscleLevel);
+    public float MuscleDamageMultiplier  => 1f + (CurrentMuscleLevel * stats.damageBonusPerMuscleLevel);
+
     private bool isDead;
     private bool isStaminaLocked;
     private bool wasSprintKeyHeldLastFrame;
     private float lastSprintTime = -999f;
+    private float intelligenceProgress; // 0-1, mevcut zeka seviyesi içindeki ilerleme
+    private float muscleProgress;       // 0-1, mevcut kas seviyesi içindeki ilerleme
 
     private void Start()
     {
-        CurrentHealth  = stats.maxHealth;
-        CurrentHunger  = stats.maxHunger;
-        CurrentWater   = stats.maxWater;
-        CurrentStamina = stats.maxStamina;
+        CurrentHealth      = stats.maxHealth;
+        CurrentHunger      = stats.maxHunger;
+        CurrentWater       = stats.maxWater;
+        CurrentStamina     = stats.maxStamina;
+        CurrentSleepEnergy = stats.maxSleepEnergy;
 
         // Başlangıç UI güncellemesi
         OnHealthChanged?.Invoke(CurrentHealth / stats.maxHealth);
         OnHungerChanged?.Invoke(CurrentHunger / stats.maxHunger);
         OnWaterChanged?.Invoke(CurrentWater / stats.maxWater);
         OnStaminaChanged?.Invoke(CurrentStamina / stats.maxStamina);
+        OnSleepEnergyChanged?.Invoke(CurrentSleepEnergy / stats.maxSleepEnergy);
+        OnIntelligenceChanged?.Invoke(CurrentIntelligenceLevel, intelligenceProgress);
+        OnMuscleChanged?.Invoke(CurrentMuscleLevel, muscleProgress);
     }
 
     private void Update()
@@ -75,7 +91,9 @@ public class PlayerStatsController : MonoBehaviour
         if (isSprinting)
         {
             lastSprintTime = Time.time;
-            ChangeStamina(-stats.staminaDrainRate * Time.deltaTime);
+            // Kas seviyesi arttıkça koşma stamina'ya daha az mal olur
+            ChangeStamina(-stats.staminaDrainRate * MuscleStaminaMultiplier * Time.deltaTime);
+            GainMuscle(stats.muscleGainPerSprintSecond * Time.deltaTime);
         }
         else if (Time.time - lastSprintTime >= stats.staminaRegenDelay)
         {
@@ -85,6 +103,9 @@ public class PlayerStatsController : MonoBehaviour
 
         float waterDrain = stats.waterDecayRate + (isSprinting ? stats.sprintWaterDrainRate : 0f);
         ChangeWater(-waterDrain * Time.deltaTime);
+
+        // Uyanık kaldıkça uyku/enerji azalır (uyuyunca veya enerji verici öğeyle doldurulur)
+        AddSleepEnergy(-stats.sleepEnergyDecayRate * Time.deltaTime);
 
         if (CurrentHunger <= 0f)
             ChangeHealth(-stats.healthDecayWhenStarving * Time.deltaTime);
@@ -132,5 +153,44 @@ public class PlayerStatsController : MonoBehaviour
     public void Drink(float waterAmount)
     {
         ChangeWater(waterAmount);
+    }
+
+    // Uyuyunca veya enerji verici bir şey yiyip/içince çağrılır (ilerleyen oturumda bağlanacak)
+    public void AddSleepEnergy(float amount)
+    {
+        CurrentSleepEnergy = Mathf.Clamp(CurrentSleepEnergy + amount, 0f, stats.maxSleepEnergy);
+        OnSleepEnergyChanged?.Invoke(CurrentSleepEnergy / stats.maxSleepEnergy);
+    }
+
+    // Kitap okununca çağrılır (ilerleyen oturumda sağ-tık-basılı-tut etkileşimi bağlanacak)
+    public void ReadBook()
+    {
+        if (CurrentIntelligenceLevel >= stats.maxIntelligenceLevel) return;
+
+        intelligenceProgress += stats.intelligencePerBook;
+        if (intelligenceProgress >= 1f)
+        {
+            intelligenceProgress = 0f;
+            CurrentIntelligenceLevel = Mathf.Min(CurrentIntelligenceLevel + 1, stats.maxIntelligenceLevel);
+        }
+
+        bool isMax = CurrentIntelligenceLevel >= stats.maxIntelligenceLevel;
+        OnIntelligenceChanged?.Invoke(CurrentIntelligenceLevel, isMax ? 1f : intelligenceProgress);
+    }
+
+    // Koşarken otomatik çağrılır; düşmana vurunca da dövüş sistemi ileride bunu çağıracak
+    public void GainMuscle(float amount)
+    {
+        if (CurrentMuscleLevel >= stats.maxMuscleLevel) return;
+
+        muscleProgress += amount;
+        if (muscleProgress >= 1f)
+        {
+            muscleProgress = 0f;
+            CurrentMuscleLevel = Mathf.Min(CurrentMuscleLevel + 1, stats.maxMuscleLevel);
+        }
+
+        bool isMax = CurrentMuscleLevel >= stats.maxMuscleLevel;
+        OnMuscleChanged?.Invoke(CurrentMuscleLevel, isMax ? 1f : muscleProgress);
     }
 }
