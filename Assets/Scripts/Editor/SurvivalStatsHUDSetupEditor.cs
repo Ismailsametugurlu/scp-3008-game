@@ -11,7 +11,8 @@ public static class SurvivalStatsHUDSetupEditor
     private const float HealthRadius  = 56f;  // büyük Can dairesi
     private const float BadgeRadius   = 13f;  // küçük rozetler
     private const float BadgeGap      = 6f;   // Can dairesi kenarı ile rozet arası boşluk
-    private const float BackgroundAlpha = 0.4f; // ortası az opak (yarı saydam)
+    private const float BackgroundAlpha = 0.75f; // ortası koyu, hafif saydam (görseldeki gibi)
+    private const float BorderThickness = 2f;    // ince siyah dış çerçeve
 
     // Rozetler 120°'den 330°'ye (üstten geçen kısa yol: 105,75,45,15,-15) diziliyor
     private const float ArcStartDeg = 120f;
@@ -165,6 +166,17 @@ public static class SurvivalStatsHUDSetupEditor
         rootRT.pivot = new Vector2(0.5f, 0.5f);
         rootRT.anchoredPosition = center;
         rootRT.sizeDelta = new Vector2(radius * 2f, radius * 2f);
+
+        // İnce siyah dış çerçeve (biraz daha büyük, en altta)
+        GameObject border = new GameObject("Border", typeof(RectTransform), typeof(Image));
+        border.transform.SetParent(root.transform, false);
+        RectTransform borderRT = border.GetComponent<RectTransform>();
+        borderRT.anchorMin = Vector2.zero; borderRT.anchorMax = Vector2.one;
+        borderRT.offsetMin = new Vector2(-BorderThickness, -BorderThickness);
+        borderRT.offsetMax = new Vector2(BorderThickness, BorderThickness);
+        Image borderImg = border.GetComponent<Image>();
+        borderImg.sprite = knob;
+        borderImg.color = Color.black;
 
         GameObject bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
         bg.transform.SetParent(root.transform, false);
