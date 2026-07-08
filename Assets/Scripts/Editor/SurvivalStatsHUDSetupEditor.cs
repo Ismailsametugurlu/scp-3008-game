@@ -4,14 +4,18 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 // Büyük Can dairesi (sol alt) + 5 küçük rozet (Su/Açlık/Uyku/Kas/Zeka), rozetler
-// Can dairesinin 0°-90° yayında (sağı ve kuzeyi) dizilir. Tools > SCP3008 > Survival Gauge HUD Kur
+// Can dairesinin 120°-330° yayında (üstten geçen kısa yol) dizilir. Tools > SCP3008 > Survival Gauge HUD Kur
 public static class SurvivalStatsHUDSetupEditor
 {
-    private const float EdgePadding   = 40f;
-    private const float HealthRadius  = 70f;  // büyük Can dairesi
-    private const float BadgeRadius   = 16f;  // küçük rozetler
-    private const float BadgeGap      = 8f;   // Can dairesi kenarı ile rozet arası boşluk
-    private const float BackgroundAlpha = 0.5f; // ortası yarı opak
+    private const float EdgePadding   = 24f;
+    private const float HealthRadius  = 56f;  // büyük Can dairesi
+    private const float BadgeRadius   = 13f;  // küçük rozetler
+    private const float BadgeGap      = 6f;   // Can dairesi kenarı ile rozet arası boşluk
+    private const float BackgroundAlpha = 0.4f; // ortası az opak (yarı saydam)
+
+    // Rozetler 120°'den 330°'ye (üstten geçen kısa yol: 105,75,45,15,-15) diziliyor
+    private const float ArcStartDeg = 120f;
+    private const float ArcEndDeg   = -30f; // 330°'ye eşdeğer
 
     private static readonly string[] OldObjectNames =
     {
@@ -56,14 +60,14 @@ public static class SurvivalStatsHUDSetupEditor
         SurvivalGaugeUI healthGauge = CreateCircle(root.transform, "HealthGauge", healthCenter, HealthRadius,
             new Color(0.85f, 0.15f, 0.15f), "CAN");
 
-        // 0°(Doğu/sağ) - 90°(Kuzey/üst) yayında 5 eş aralıklı rozet
+        // 120°'den 330°'ye (üstten geçen kısa yol) 5 eş aralıklı rozet: 105,75,45,15,-15
         BadgeDef[] badges =
         {
-            new BadgeDef("WaterGauge",  "SU",    new Color(0.2f, 0.55f, 0.85f),  9f),
-            new BadgeDef("HungerGauge", "ACLIK", new Color(0.85f, 0.55f, 0.15f), 27f),
+            new BadgeDef("WaterGauge",  "SU",    new Color(0.2f, 0.55f, 0.85f),  105f),
+            new BadgeDef("HungerGauge", "ACLIK", new Color(0.85f, 0.55f, 0.15f), 75f),
             new BadgeDef("SleepGauge",  "UYKU",  new Color(0.55f, 0.35f, 0.85f), 45f),
-            new BadgeDef("MuscleGauge", "KAS",   new Color(0.7f, 0.3f, 0.2f),    63f),
-            new BadgeDef("IntGauge",    "ZEKA",  new Color(0.2f, 0.75f, 0.75f),  81f),
+            new BadgeDef("MuscleGauge", "KAS",   new Color(0.7f, 0.3f, 0.2f),    15f),
+            new BadgeDef("IntGauge",    "ZEKA",  new Color(0.2f, 0.75f, 0.75f),  -15f),
         };
 
         float distFromCenter = HealthRadius + BadgeGap + BadgeRadius;
