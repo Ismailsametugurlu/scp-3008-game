@@ -9,7 +9,7 @@ using UnityEditor.SceneManagement;
 public static class InventoryPanelSetupEditor
 {
     private const int PocketSlots = 3;
-    private const int BackpackSlots = 6;
+    private const int BackpackSlots = 0; // çanta şimdilik ertelendi; craft gelince 6 yap
     private const int Columns = 3;
     private const float SlotSize = 64f;
     private const float SlotGap = 10f;
