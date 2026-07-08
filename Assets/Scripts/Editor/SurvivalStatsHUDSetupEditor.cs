@@ -9,7 +9,8 @@ public static class SurvivalStatsHUDSetupEditor
 {
     private const float EdgePadding   = 24f;
     private const float HealthRadius  = 56f;  // büyük Can dairesi
-    private const float BadgeRadius   = 13f;  // küçük rozetler
+    private const float BadgeRadius   = 17f;  // küçük rozetler
+    private const float BadgeInnerRadiusRatio = 0.81f; // rozetlerde halka Can'a göre ~%50 daha ince
     private const float BadgeGap      = 6f;   // Can dairesi kenarı ile rozet arası boşluk
     private const float BackgroundAlpha = 0.75f; // ortası koyu, hafif saydam (görseldeki gibi)
     private const float BorderThickness = 2f;    // ince siyah dış çerçeve
@@ -82,16 +83,16 @@ public static class SurvivalStatsHUDSetupEditor
 
             if (b.Name == "MuscleGauge")
             {
-                muscleGauge = CreateLeveledCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, b.Color, b.Label, 5);
+                muscleGauge = CreateLeveledCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, b.Color, b.Label, 5, BadgeInnerRadiusRatio);
             }
             else if (b.Name == "IntGauge")
             {
                 Color gold = new Color(1f, 0.85f, 0.2f);
-                intGauge = CreateLeveledCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, gold, b.Label, 5);
+                intGauge = CreateLeveledCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, gold, b.Label, 5, BadgeInnerRadiusRatio);
             }
             else
             {
-                SurvivalGaugeUI gauge = CreateCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, b.Label);
+                SurvivalGaugeUI gauge = CreateCircle(root.transform, b.Name, pos, BadgeRadius, b.Color, b.Label, BadgeInnerRadiusRatio);
                 if (b.Name == "WaterGauge") waterGauge = gauge;
                 else if (b.Name == "HungerGauge") hungerGauge = gauge;
                 else if (b.Name == "SleepGauge") sleepGauge = gauge;
@@ -127,9 +128,9 @@ public static class SurvivalStatsHUDSetupEditor
     }
 
     // Basit sürekli (0-1) dolan daire: arka plan (yarı opak) + renkli halka + etiket
-    private static SurvivalGaugeUI CreateCircle(Transform parent, string name, Vector2 center, float radius, Color color, string label)
+    private static SurvivalGaugeUI CreateCircle(Transform parent, string name, Vector2 center, float radius, Color color, string label, float innerRadiusRatio = 0.62f)
     {
-        GameObject root = BuildCircleBase(parent, name, center, radius, color, label, out Image fillImg);
+        GameObject root = BuildCircleBase(parent, name, center, radius, color, label, out Image fillImg, innerRadiusRatio);
         SurvivalGaugeUI gauge = root.AddComponent<SurvivalGaugeUI>();
         var so = new SerializedObject(gauge);
         so.FindProperty("fillImage").objectReferenceValue = fillImg;
@@ -139,9 +140,9 @@ public static class SurvivalStatsHUDSetupEditor
 
     // Seviyeli (Zeka/Kas) daire: aynı görünüm, max seviyede renk değişir
     private static LeveledGaugeUI CreateLeveledCircle(Transform parent, string name, Vector2 center, float radius,
-        Color normalColor, Color maxColor, string label, int maxLevel)
+        Color normalColor, Color maxColor, string label, int maxLevel, float innerRadiusRatio = 0.62f)
     {
-        GameObject root = BuildCircleBase(parent, name, center, radius, normalColor, label, out Image fillImg);
+        GameObject root = BuildCircleBase(parent, name, center, radius, normalColor, label, out Image fillImg, innerRadiusRatio);
         LeveledGaugeUI gauge = root.AddComponent<LeveledGaugeUI>();
         var so = new SerializedObject(gauge);
         so.FindProperty("fillImage").objectReferenceValue = fillImg;
@@ -153,7 +154,7 @@ public static class SurvivalStatsHUDSetupEditor
     }
 
     // Ortak daire yapısı: dış halka doluyor/azalıyor, merkez sabit maske + ikon (durum çevreden anlaşılır)
-    private static GameObject BuildCircleBase(Transform parent, string name, Vector2 center, float radius, Color color, string label, out Image fillImg)
+    private static GameObject BuildCircleBase(Transform parent, string name, Vector2 center, float radius, Color color, string label, out Image fillImg, float innerRadiusRatio)
     {
         Sprite knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
         Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -202,7 +203,7 @@ public static class SurvivalStatsHUDSetupEditor
         fillImg.fillAmount = 1f;
 
         // Merkez maskesi: dolum ortada değil, dış halkada görünsün diye ortayı kapatır
-        float innerRadius = radius * 0.62f;
+        float innerRadius = radius * innerRadiusRatio;
         GameObject mask = new GameObject("CenterMask", typeof(RectTransform), typeof(Image));
         mask.transform.SetParent(root.transform, false);
         RectTransform maskRT = mask.GetComponent<RectTransform>();
