@@ -22,8 +22,8 @@ public class PlayerStatsController : MonoBehaviour
     // Su durumuna göre PlayerController hız çarpanı alır
     public float SpeedMultiplier => CurrentWater > 0f ? 1f : stats.lowWaterSpeedMultiplier;
 
-    // Stamina bittiyse PlayerController koşmayı kesmeli
-    public bool CanSprint => CurrentStamina > 0f;
+    // Stamina eşiğin altına düşünce koşma kilitlenir; eşiğe geri çıkana kadar açılmaz
+    public bool CanSprint => CurrentStamina / stats.maxStamina >= stats.staminaSprintThreshold;
 
     private bool isDead;
     private float lastSprintTime = -999f;
@@ -53,8 +53,8 @@ public class PlayerStatsController : MonoBehaviour
     {
         ChangeHunger(-stats.hungerDecayRate * Time.deltaTime);
 
-        // Koşma isteği var ama stamina bittiyse artık koşamaz sayılır
-        bool isSprinting = Keyboard.current.leftShiftKey.isPressed && CurrentStamina > 0f;
+        // Koşma isteği var ama eşiğin altındaysa artık koşamaz sayılır
+        bool isSprinting = Keyboard.current.leftShiftKey.isPressed && CanSprint;
 
         if (isSprinting)
         {

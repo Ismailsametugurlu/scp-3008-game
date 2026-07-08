@@ -20,6 +20,9 @@ public class PlayerStatsSO : ScriptableObject
     public float staminaRegenRate  = 15f; // bekleme bitince saniyede dolma
     public float staminaRegenDelay = 1.5f; // koşma bırakılınca dolmaya başlamadan önceki bekleme (korku gerilimi için)
 
+    [Range(0f, 1f)]
+    public float staminaSprintThreshold = 0.35f; // bu oranın altına düşünce koşma kilitlenir, tekrar bu orana çıkana kadar açılmaz
+
     [Header("Açlıktan Can Kaybı")]
     public float healthDecayWhenStarving = 2f; // hunger 0 olunca saniyede bu kadar can gider
 
