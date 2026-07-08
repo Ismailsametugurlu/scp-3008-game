@@ -55,12 +55,21 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        HandleLook();
-        HandleMovement();
-        HandleCrouch();
+        // Panel (çanta vb.) açıkken bakış/hareket/etkileşim durur; yerçekimi ve çömelme geçişi sürer
+        if (!PlayerInputLock.IsLocked)
+        {
+            HandleLook();
+            HandleMovement();
+            HandleCrouch();
+            HandleWhistle();
+        }
+        else if (statsController != null)
+        {
+            statsController.IsActivelySprinting = false;
+        }
+
         HandleCrouchTransition();
         ApplyGravity();
-        HandleWhistle();
     }
 
     // Mouse hareketi: X → oyuncu yatay dönüşü, Y → kamera dikey dönüşü

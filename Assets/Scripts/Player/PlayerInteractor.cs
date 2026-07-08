@@ -24,6 +24,8 @@ public class PlayerInteractor : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerInputLock.IsLocked) { IsEating = false; return; } // panel açıkken etkileşim durur
+
         HandlePickup();
         HandleEat();
     }

@@ -51,6 +51,8 @@ public class PlayerInventory : MonoBehaviour
     // 1-2-3 tuşları ve fare tekeri ile hotbar slotu seç
     private void HandleSelectionInput()
     {
+        if (PlayerInputLock.IsLocked) return; // panel açıkken slot seçimi durur
+
         var kb = Keyboard.current;
         if (kb.digit1Key.wasPressedThisFrame) SetSelected(0);
         if (kb.digit2Key.wasPressedThisFrame) SetSelected(1);
@@ -95,6 +97,16 @@ public class PlayerInventory : MonoBehaviour
         slots[selectedIndex] = ItemStack.Empty;
         OnInventoryChanged?.Invoke();
         return true;
+    }
+
+    // İki slotu takas eder (çanta panelinde drag-drop için). Boş hedefe taşıma da bu yolla olur.
+    public void MoveItem(int from, int to)
+    {
+        if (from == to) return;
+        if (from < 0 || from >= TotalSize || to < 0 || to >= TotalSize) return;
+
+        (slots[from], slots[to]) = (slots[to], slots[from]);
+        OnInventoryChanged?.Invoke();
     }
 
     // Çanta craftlanıp takılınca çağrılır — ekstra slotları açar (ileride crafting bağlar)
