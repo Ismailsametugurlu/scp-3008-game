@@ -152,7 +152,7 @@ public static class SurvivalStatsHUDSetupEditor
         return gauge;
     }
 
-    // Ortak daire yapısı: arka plan (yarı opak) + Radial360 dolan renkli halka + ortada etiket
+    // Ortak daire yapısı: dış halka doluyor/azalıyor, merkez sabit maske + ikon (durum çevreden anlaşılır)
     private static GameObject BuildCircleBase(Transform parent, string name, Vector2 center, float radius, Color color, string label, out Image fillImg)
     {
         Sprite knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
@@ -200,6 +200,20 @@ public static class SurvivalStatsHUDSetupEditor
         fillImg.fillOrigin = (int)Image.Origin360.Top;
         fillImg.fillClockwise = true;
         fillImg.fillAmount = 1f;
+
+        // Merkez maskesi: dolum ortada değil, dış halkada görünsün diye ortayı kapatır
+        float innerRadius = radius * 0.62f;
+        GameObject mask = new GameObject("CenterMask", typeof(RectTransform), typeof(Image));
+        mask.transform.SetParent(root.transform, false);
+        RectTransform maskRT = mask.GetComponent<RectTransform>();
+        maskRT.anchorMin = new Vector2(0.5f, 0.5f);
+        maskRT.anchorMax = new Vector2(0.5f, 0.5f);
+        maskRT.pivot = new Vector2(0.5f, 0.5f);
+        maskRT.anchoredPosition = Vector2.zero;
+        maskRT.sizeDelta = new Vector2(innerRadius * 2f, innerRadius * 2f);
+        Image maskImg = mask.GetComponent<Image>();
+        maskImg.sprite = knob;
+        maskImg.color = new Color(0.05f, 0.05f, 0.05f, 0.9f);
 
         GameObject labelGO = new GameObject("Label", typeof(RectTransform), typeof(Text));
         labelGO.transform.SetParent(root.transform, false);
