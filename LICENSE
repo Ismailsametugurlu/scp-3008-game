@@ -1,0 +1,32 @@
+Copyright (c) 2026 İsmail Samet Uğurlu. All rights reserved.
+
+This repository is published publicly for the sole purpose of portfolio review —
+so that prospective employers, collaborators and reviewers can read the source and
+evaluate the author's work.
+
+You MAY:
+  - View and read the source code.
+  - Reference it when evaluating the author.
+
+You MAY NOT, without prior written permission from the author:
+  - Copy, reproduce or redistribute any part of this code or its assets.
+  - Use this code or its assets, in whole or in part, in any project,
+    commercial or non-commercial.
+  - Modify or create derivative works from it.
+  - Sell, sublicense or otherwise transfer it.
+
+No license, express or implied, is granted to any patent, trademark, or other
+intellectual property right of the author.
+
+NOTE ON THE SCP-3008 CONCEPT: this project is an unofficial fan implementation of
+SCP-3008, a work of the SCP Foundation wiki community licensed under CC BY-SA 3.0
+(https://creativecommons.org/licenses/by-sa/3.0/). The concept, setting and name
+are not covered by the copyright claim above and remain with their original authors.
+The terms above apply to the original source code in this repository.
+
+Third-party assets and packages referenced by this project remain the property of
+their respective owners and are governed by their own licenses.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+For permission requests, contact: rsamothear@gmail.com
